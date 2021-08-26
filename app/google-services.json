@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "479719089273",
+    "project_id": "edutalk-app",
+    "storage_bucket": "edutalk-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:479719089273:android:0b2642caa5edde08c8e0a8",
+        "android_client_info": {
+          "package_name": "com.joejoe2.testsensor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "479719089273-7qebnlfmu6hnvgpma6f3cuneihnk1812.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj7DJ0toNgfnwWgxjw5j6qbNJHmDcubvo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "479719089273-7qebnlfmu6hnvgpma6f3cuneihnk1812.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
