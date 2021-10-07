@@ -1,7 +1,10 @@
 package com.joejoe2.testsensor.iottalk;
 
+import android.content.Context;
+
+import com.joejoe2.testsensor.sensor.DFInfo;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensor;
-import com.joejoe2.testsensor.utils.Callable;
+import com.joejoe2.testsensor.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,17 +21,18 @@ public class IoTTalkDAI {
     private String[] acceptProtos = {"mqtt"};
     private String deviceName = "Dummy_Test_java";
     private String deviceModel = "Dummy_Device";
-    private AppID deviceAddr = new AppID();
+    private AppID deviceAddr;
     private String userName = null;
     private DAN dan;
 
-    public StreamSensor[] sensors;
+    private StreamSensor[] sensors;
 
-    public IoTTalkDAI(String csmEndpoint, String deviceName, String deviceModel, StreamSensor[] sensors) {
+    public IoTTalkDAI(Context context, String csmEndpoint, String deviceName, String deviceModel, StreamSensor[] sensors) {
         this.csmEndpoint = csmEndpoint;
         this.deviceName = deviceName;
         this.deviceModel = deviceModel;
         this.sensors = sensors;
+        this.deviceAddr = Utils.getDeviceAddress(context, csmEndpoint, deviceModel, deviceName, false);
     }
 
     public void start() throws Exception{
@@ -37,27 +41,20 @@ public class IoTTalkDAI {
 
         //set consumer of StreamingSensor
         for (StreamSensor sensor : sensors) {
-            if (sensor.getSensorType().isNeedTimeStamp()){
-                sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
-                    try {
-                        JSONArray r = new JSONArray(sensorData);
-                        r.put(sensorData.length, System.currentTimeMillis());
-                        dan.push(sensor.getId(), r, 0, false);  //push data
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            }else {
-                sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
-                    try {
-                        JSONArray r = new JSONArray(sensorData);
-                        dan.push(sensor.getId(), r, 0, false);  //push data
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+            sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
+                long sendAt=0;
+                try {
+                    JSONArray data = new JSONArray(sensorData);
+                    sendAt = System.currentTimeMillis();
+                    if (((DFInfo)sensor.getBaseSensorType()).isNeedTimeStamp())data.put(sensorData.length, sendAt);
+                    dan.push(sensor.getId(), data);  //push data
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return sendAt;
+            });
         }
+
         //start sensor and dai to work
         new Thread(()->{
             try {
@@ -99,7 +96,7 @@ public class IoTTalkDAI {
             }
         };
         //avoid mqtt too many in progress problem
-        dan.setMaxflight(sensors.length*200);
+        dan.setMaxInflight(sensors.length*200);
     }
 
     public void stop() {

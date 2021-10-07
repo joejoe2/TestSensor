@@ -2,42 +2,32 @@ package com.joejoe2.testsensor.sensor.streamsensor;
 
 import android.hardware.Sensor;
 
-import java.util.Arrays;
+import com.joejoe2.testsensor.sensor.BaseSensorType;
+import com.joejoe2.testsensor.sensor.DFInfo;
 
-/**
- * this enum.toString() is same as iottalk device feature name (inconsistent with edutalk)
- * , and getValue() is same as android sensor type
- * , and featureSubName() is semantic feature name ex. Acceleration, Gyroscope, ...
- */
-public enum StreamSensorType {
-    Acceleration_I(Sensor.TYPE_ACCELEROMETER),
-    Gyroscope_I(Sensor.TYPE_GYROSCOPE),
-    Orientation_I(Sensor.TYPE_ORIENTATION),
+public enum StreamSensorType implements BaseSensorType, DFInfo {
+    Acceleration(Sensor.TYPE_ACCELEROMETER),
+    Gyroscope(Sensor.TYPE_GYROSCOPE),
+    Orientation(Sensor.TYPE_ORIENTATION),
+    Magnetometer(Sensor.TYPE_MAGNETIC_FIELD),
     ;
 
-    private final int id;
-    StreamSensorType(int sensorType) {
-        this.id = sensorType;
+    private final int nativeSensorCode;
+    StreamSensorType(int sensorCode) {
+        this.nativeSensorCode = sensorCode;
     }
-    public int getValue() { return id; }
+    public int getNativeSensorCode() { return nativeSensorCode; }
 
-    @Override
-    public String toString() {
-        return this.name().replace("_", "-");
-    }
-
-    public String semanticAlias(){
-        return this.name().substring(0, this.name().indexOf("_"));
-    }
-
-    public String getUnit(){
+    public String getAcceptUnit(){
         switch (this){
-            case Acceleration_I:
+            case Acceleration:
                 return "m/s^2";
-            case Gyroscope_I:
+            case Gyroscope:
                 return "degree/s";
-            case Orientation_I:
+            case Orientation:
                 return "degree";
+            case Magnetometer:
+                return "μT";
             default:
                 throw new Error("undefined unit of SensorType !");
         }
@@ -45,10 +35,11 @@ public enum StreamSensorType {
 
     public String[] getDataDimensions(){
         switch (this){
-            case Acceleration_I:
+            case Acceleration:
+            case Magnetometer:
                 return new String[]{"x", "y", "z"};
-            case Gyroscope_I:
-            case Orientation_I:
+            case Gyroscope:
+            case Orientation:
                 return new String[]{"α", "β", "γ"};
             default:
                 throw new Error("undefined output of SensorType !");
@@ -59,14 +50,15 @@ public enum StreamSensorType {
         float[] res=new float[data.length];
 
         switch (this){
-            case Acceleration_I:
-            case Orientation_I:
-                for (int i=0;i<data.length;i++){
+            case Acceleration: //same, m/s^2
+            case Orientation: //same, degree
+            case Magnetometer: //same, μT
+                for (int i=0;i<3;i++){
                     res[i] = data[i];
                 }
                 break;
-            case Gyroscope_I: //iottalk need degree/s
-                for (int i=0;i<data.length;i++){
+            case Gyroscope: // rad/s to degree/s
+                for (int i=0;i<3;i++){
                     res[i] = (float)(data[i]*180/Math.PI);
                 }
                 break;
@@ -75,5 +67,21 @@ public enum StreamSensorType {
         }
 
         return res;
+    }
+
+    @Override
+    public String getDFAlias() {
+        return name();
+    }
+
+    private boolean needTimeStamp = false;
+    @Override
+    public boolean isNeedTimeStamp() {
+        return needTimeStamp;
+    }
+
+    @Override
+    public void setNeedTimestamp(boolean needTimeStamp) {
+        this.needTimeStamp = needTimeStamp;
     }
 }

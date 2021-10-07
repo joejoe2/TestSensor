@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -17,11 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.joejoe2.testsensor.customUI.CustomUIFactory;
 import com.joejoe2.testsensor.customUI.MutliDimesionDataText;
 import com.joejoe2.testsensor.iottalk.IoTTalkDAI;
 import com.joejoe2.testsensor.MainActivity;
 import com.joejoe2.testsensor.R;
-import com.joejoe2.testsensor.sensor.SensorType;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensorType;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensor;
 
@@ -32,7 +31,7 @@ import java.util.stream.IntStream;
 
 public class IoTTalkSmartphoneSA extends AppCompatActivity {
     String CSMEndpoint;
-    final String DEVICE_MODEL = "Smartphone";//"ALLRC";
+    final String DEVICE_MODEL = "Smartphone";
     final String DEVICE_NAME = "Android_"+UUID.randomUUID().toString().substring(0, 8);
     int sampleRate;
     HashSet<StreamSensorType> selectedSensorTypes;
@@ -45,8 +44,8 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
 
     Button exitButton;
     TextView deviceModelTexView, deviceNameTexView;
-    ScrollView dataView;
-    LinearLayout dataLayout;
+    ScrollView sensorDataView;
+    LinearLayout sensorDataLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,38 +82,37 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
         deviceModelTexView.setText(DEVICE_MODEL);
         deviceNameTexView = findViewById(R.id.deviceNameTextView);
         deviceNameTexView.setText(DEVICE_NAME);
-        dataView = findViewById(R.id.scrollView);
-        dataLayout=findViewById(R.id.dataLayout);
+        sensorDataView = findViewById(R.id.scrollView);
+        sensorDataLayout =findViewById(R.id.dataLayout);
     }
 
     private void setDAI(){
         selectedSensors = getSensors(selectedSensorTypes);
-        ioTTalkDai = new IoTTalkDAI(CSMEndpoint, DEVICE_NAME, DEVICE_MODEL, selectedSensors);
+        ioTTalkDai = new IoTTalkDAI(this, CSMEndpoint, DEVICE_NAME, DEVICE_MODEL, selectedSensors);
     }
 
     private StreamSensor[] getSensors(HashSet<StreamSensorType> selectedSensors){
         ArrayList<StreamSensor> sensors = new ArrayList<>();
 
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        for (StreamSensorType sensorType: selectedSensors) {
-            StreamSensor sensor = new StreamSensor(sensorType.toString(), sensorManager, new SensorType(sensorType, false), sampleRate);
-            MutliDimesionDataText dataText=buildMutlDimesionDataText(sensorType+" ( "+sensorType.getUnit()+" )", sensorType.getDataDimensions());
-            //need to update text when receive sensor value
+        for (StreamSensorType streamSensorType: selectedSensors) {
+            //build ui
+            MutliDimesionDataText dataText= CustomUIFactory.buildMutlDimesionDataText(this,
+                    streamSensorType.getDFAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensions());
+            sensorDataLayout.addView(dataText);
+
+            //create sensor and update method
+            StreamSensor sensor = new StreamSensor(streamSensorType.getDFAlias()+"-I", sensorManager, streamSensorType, sampleRate);
             sensor.setOnSensorSignalCallBack((float[] data)->{
                 runOnUiThread(()->{
                     dataText.setValues(IntStream.range(0, data.length).mapToObj(i -> String.format("%.2f", data[i])).toArray(String[]::new));
                 });
             });
+
             sensors.add(sensor);
         }
 
         return sensors.toArray(new StreamSensor[0]);
-    }
-
-    private MutliDimesionDataText buildMutlDimesionDataText(String title, String[] dimensionNames){
-        MutliDimesionDataText dataText= new MutliDimesionDataText(this, title, dimensionNames, 18, 24, Color.WHITE);
-        dataLayout.addView(dataText);
-        return dataText;
     }
 
     private void setListeners(){
@@ -130,7 +128,6 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
         // the register of dan will lost, so we cannot continue to push data
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         onNetworkStateChangeCallback = new ConnectivityManager.NetworkCallback() {
-
             @Override
             public void onAvailable(Network network) {
                 if (originalNetwork==null){
@@ -139,7 +136,6 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
                     doOnStateChange();
                 }
             }
-
             @Override
             public void onLost(Network network) {
                 doOnStateChange();

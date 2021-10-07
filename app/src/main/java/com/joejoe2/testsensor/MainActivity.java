@@ -1,17 +1,10 @@
 package com.joejoe2.testsensor;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,7 +16,7 @@ import com.joejoe2.testsensor.iottalk.IoTTalkDAI;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensor;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensorType;
 import com.joejoe2.testsensor.sa.IoTTalkSmartphoneSA;
-import com.joejoe2.testsensor.utils.PermissionUtils;
+import com.joejoe2.testsensor.utils.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setUI();
-        PermissionUtils.requestPermissions(this, PermissionUtils.getLackingPermissions(this));
+        PermissionManager.requestPermissions(this, PermissionManager.getLackingPermissions(this));
         setListeners();
     }
 
@@ -67,9 +60,9 @@ public class MainActivity extends AppCompatActivity {
         startSAButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> lackingPermissions = PermissionUtils.getLackingPermissions(MainActivity.this);
+                ArrayList<String> lackingPermissions = PermissionManager.getLackingPermissions(MainActivity.this);
                 if (lackingPermissions.size()>0){
-                    PermissionUtils.requestPermissionsInSetting(MainActivity.this, lackingPermissions);
+                    PermissionManager.requestPermissionsInSetting(MainActivity.this, lackingPermissions);
                     return;
                 }
 
@@ -92,13 +85,13 @@ public class MainActivity extends AppCompatActivity {
     private HashSet<StreamSensorType> getSelectedSensors(){
         HashSet<StreamSensorType> selectedSensors=new HashSet<>();
         if(accCheckBox.isChecked()){
-            selectedSensors.add(StreamSensorType.Acceleration_I);
+            selectedSensors.add(StreamSensorType.Acceleration);
         }
         if(gyrCheckBox.isChecked()){
-            selectedSensors.add(StreamSensorType.Gyroscope_I);
+            selectedSensors.add(StreamSensorType.Gyroscope);
         }
         if(oriCheckBox.isChecked()){
-            selectedSensors.add(StreamSensorType.Orientation_I);
+            selectedSensors.add(StreamSensorType.Orientation);
         }
         return selectedSensors;
     }

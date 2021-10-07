@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import androidx.core.app.ActivityCompat;
 
-public class PermissionUtils {
+public class PermissionManager {
     private static final String[] requiredPermissions=new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_COARSE_LOCATION,

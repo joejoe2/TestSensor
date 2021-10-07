@@ -1,0 +1,172 @@
+ccm_1        | 2021-09-02T12:38:03.036308370Z [pid: 18|app: 0|req: 11/11] 192.168.96.5 () {38 vars in 531 bytes} [Thu Sep  2 12:38:02 2021] GET /api/v0/project/2 => generated 5356 bytes in 86 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:03.037248132Z 192.168.96.1 - - [02/Sep/2021:12:38:03 +0000] "GET /iottalk/ccm/api/v0/project/2 HTTP/1.1" 200 5356 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:03.117183470Z [pid: 18|app: 0|req: 12/12] 192.168.96.5 () {38 vars in 608 bytes} [Thu Sep  2 12:38:03 2021] GET /api/v0/project/2/deviceobject/4 => generated 6606 bytes in 76 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:03.117413581Z 192.168.96.1 - - [02/Sep/2021:12:38:03 +0000] "GET /iottalk/ccm/api/v0/project/2/deviceobject/4 HTTP/1.1" 200 6606 "-" "python-requests/2.21.0" "-"
+edutalk_1    | 2021-09-02T12:38:03.121721161Z INFO:werkzeug:192.168.96.5 - - [02/Sep/2021 12:38:03] "GET /lecture/4/rc/?token=e3157b6b66a14cf9bfaef19b1440745f HTTP/1.0" 200 -
+nginx_1      | 2021-09-02T12:38:03.122288692Z 219.91.48.114 - - [02/Sep/2021:12:38:03 +0000] "GET /lecture/4/rc/?token=e3157b6b66a14cf9bfaef19b1440745f HTTP/1.1" 200 9167 "-" "okhttp/4.9.1" "-"
+csm_1        | 2021-09-02T12:38:04.269226536Z INFO:iottalk.conn:connmgr msg callback setup 8777f56f-51be-43f9-b9ab-4d1eddda44a8
+mosquitto_1  | 2021-09-02T12:38:04.269554581Z 1630586284: connmgr-3741798a-9abe-44c2-ad83-7ed87a2bba48 2 8777f56f-51be-43f9-b9ab-4d1eddda44a8/ctrl/i
+nginx_1      | 2021-09-02T12:38:04.272594270Z 219.91.48.114 - - [02/Sep/2021:12:38:04 +0000] "PUT /iottalk/csm/8777f56f-51be-43f9-b9ab-4d1eddda44a8 HTTP/1.1" 200 347 "-" "Dalvik/2.1.0 (Linux; U; Android 11; SM-G9810 Build/RP1A.200720.012)" "-"
+csm_1        | 2021-09-02T12:38:04.272880908Z INFO:tornado.access:200 PUT /8777f56f-51be-43f9-b9ab-4d1eddda44a8 (192.168.96.5) 7.28ms
+ccm_1        | 2021-09-02T12:38:04.273314154Z DEBUG:DEVICE:recv device payload: {"op": "anno", "type": "register", "timestamp": "9dfff67e-0bea-11ec-9ebd-0242c0a86006", "da": {"id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "rev": "1186da3e-8493-4ea9-8415-fe9ec2998ac4", "register_time": 1630586284.266449, "name": "a.ALLRC", "accept_protos": ["mqtt"], "idf_list": [["RangeSlider1", [null]], ["Humidity-I", [null]], ["RangeSlider5", [null]], ["RangeSlider4", [null]], ["Alcohol-I", [null]], ["RangeSlider3", [null]], ["RangeSlider2", [null]], ["Orientation-I", [null]], ["Acceleration-I", [null]], ["Magnetometer-I", [null]], ["UV-I", [null]], ["Gyroscope-I", [null]]], "odf_list": [null], "profile": {"model": "ALLRC"}}}
+mosquitto_1  | 2021-09-02T12:38:04.304349364Z 1630586284: New connection from 219.91.48.114 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:04.612344535Z 1630586284: New client connected from 219.91.48.114 as iottalk-py-8777f56f-51be-43f9-b9ab-4d1eddda44a8 (p2, c1, k30).
+mosquitto_1  | 2021-09-02T12:38:04.624167697Z 1630586284: iottalk-py-8777f56f-51be-43f9-b9ab-4d1eddda44a8 2 8777f56f-51be-43f9-b9ab-4d1eddda44a8/ctrl/o
+csm_1        | 2021-09-02T12:38:04.651730781Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: online
+ccm_1        | 2021-09-02T12:38:04.653284928Z DEBUG:DEVICE:recv device payload: {"op": "anno", "type": "online", "timestamp": "9e3a1d86-0bea-11ec-9da4-0242c0a86006", "da": "8777f56f-51be-43f9-b9ab-4d1eddda44a8"}
+ccm_1        | 2021-09-02T12:38:04.772318461Z [pid: 18|app: 0|req: 13/13] 192.168.96.5 () {38 vars in 532 bytes} [Thu Sep  2 12:38:04 2021] GET /api/v0/project/2 => generated 5356 bytes in 80 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:04.773206148Z 192.168.96.1 - - [02/Sep/2021:12:38:04 +0000] "GET /iottalk/ccm/api/v0/project/2 HTTP/1.1" 200 5356 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:04.849811384Z [pid: 18|app: 0|req: 14/14] 192.168.96.5 () {38 vars in 608 bytes} [Thu Sep  2 12:38:04 2021] GET /api/v0/project/2/deviceobject/4 => generated 6606 bytes in 73 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:04.850754456Z 192.168.96.1 - - [02/Sep/2021:12:38:04 +0000] "GET /iottalk/ccm/api/v0/project/2/deviceobject/4 HTTP/1.1" 200 6606 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:04.876223241Z [pid: 18|app: 0|req: 15/15] 192.168.96.5 () {40 vars in 612 bytes} [Thu Sep  2 12:38:04 2021] POST /api/v0/project/2/deviceobject/4/device/unbind/ => generated 25 bytes in 6 msecs (HTTP/1.0 200) 6 headers in 307 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:04.876407780Z 192.168.96.1 - - [02/Sep/2021:12:38:04 +0000] "POST /iottalk/ccm/api/v0/project/2/deviceobject/4/device/unbind/ HTTP/1.1" 200 25 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:04.908261111Z [pid: 18|app: 0|req: 16/16] 192.168.96.5 () {38 vars in 578 bytes} [Thu Sep  2 12:38:04 2021] GET /api/v0/project/2/deviceobject/4/device/ => generated 275 bytes in 9 msecs (HTTP/1.0 200) 6 headers in 308 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:04.908381347Z 192.168.96.1 - - [02/Sep/2021:12:38:04 +0000] "GET /iottalk/ccm/api/v0/project/2/deviceobject/4/device/ HTTP/1.1" 200 275 "-" "python-requests/2.21.0" "-"
+csm_1        | 2021-09-02T12:38:04.956763930Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:04.956867741Z 1630586284: Client esm-3 disconnected.
+ccm_1        | 2021-09-02T12:38:04.968629396Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+csm_1        | 2021-09-02T12:38:04.971037422Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:04.971202818Z 1630586284: Client esm-4 disconnected.
+ccm_1        | 2021-09-02T12:38:04.984099281Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider1", "idf_type": ["sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 1, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:04.995178603Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+csm_1        | 2021-09-02T12:38:05.000856790Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.001200983Z 1630586285: Client esm-5 disconnected.
+csm_1        | 2021-09-02T12:38:05.007260901Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.007539455Z 1630586285: Client esm-6 disconnected.
+csm_1        | 2021-09-02T12:38:05.022677286Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.023067878Z 1630586285: Client esm-7 disconnected.
+ccm_1        | 2021-09-02T12:38:05.024123807Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider2", "idf_type": ["sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 1, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.024441514Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.024622231Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider3", "idf_type": ["sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 1, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.038369652Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+csm_1        | 2021-09-02T12:38:05.042195786Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.042714898Z 1630586285: Client esm-8 disconnected.
+ccm_1        | 2021-09-02T12:38:05.043764761Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider4", "idf_type": ["sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 1, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.051874092Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.058792623Z [pid: 18|app: 0|req: 17/17] 192.168.96.5 () {40 vars in 682 bytes} [Thu Sep  2 12:38:04 2021] POST /api/v0/project/2/deviceobject/4/device/bind/8777f56f-51be-43f9-b9ab-4d1eddda44a8/ => generated 34 bytes in 129 msecs (HTTP/1.0 200) 6 headers in 307 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:05.058936250Z 192.168.96.1 - - [02/Sep/2021:12:38:05 +0000] "POST /iottalk/ccm/api/v0/project/2/deviceobject/4/device/bind/8777f56f-51be-43f9-b9ab-4d1eddda44a8/ HTTP/1.1" 200 34 "-" "python-requests/2.21.0" "-"
+edutalk_1    | 2021-09-02T12:38:05.063104688Z INFO:werkzeug:192.168.96.5 - - [02/Sep/2021 12:38:05] "POST /lecture/4/rc/bind/8777f56f-51be-43f9-b9ab-4d1eddda44a8 HTTP/1.0" 200 -
+nginx_1      | 2021-09-02T12:38:05.063803470Z 219.91.48.114 - - [02/Sep/2021:12:38:05 +0000] "POST /lecture/4/rc/bind/8777f56f-51be-43f9-b9ab-4d1eddda44a8 HTTP/1.1" 200 15 "-" "okhttp/4.9.1" "-"
+csm_1        | 2021-09-02T12:38:05.065425838Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.065614447Z 1630586285: Client esm-9 disconnected.
+csm_1        | 2021-09-02T12:38:05.085973984Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.086297948Z 1630586285: Client esm-10 disconnected.
+csm_1        | 2021-09-02T12:38:05.100021229Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.100387496Z 1630586285: Client esm-11 disconnected.
+csm_1        | 2021-09-02T12:38:05.114150763Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.114545789Z 1630586285: Client esm-12 disconnected.
+ccm_1        | 2021-09-02T12:38:05.127258044Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider5", "idf_type": ["sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 1, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.127477795Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.128976267Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Acceleration-I", "idf_type": ["sample", "sample", "sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 4, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.129172346Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.129413262Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Gyroscope-I", "idf_type": ["sample", "sample", "sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 4, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.129671296Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.130485221Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Orientation-I", "idf_type": ["sample", "sample", "sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 4, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.131488441Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.132022515Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Magnetometer-I", "idf_type": ["sample", "sample", "sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 4, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.132165212Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+csm_1        | 2021-09-02T12:38:05.135570026Z INFO:iottalk.esm:terminating ESM process
+mosquitto_1  | 2021-09-02T12:38:05.135769895Z 1630586285: Client esm-13 disconnected.
+csm_1        | 2021-09-02T12:38:05.154166871Z INFO:iottalk.esm:terminating ESM process
+csm_1        | 2021-09-02T12:38:05.154270993Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.154394084Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+mosquitto_1  | 2021-09-02T12:38:05.154722018Z 1630586285: Client esm-14 disconnected.
+ccm_1        | 2021-09-02T12:38:05.171283561Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Humidity-I", "idf_type": ["sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 2, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.181592505Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.181782984Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "UV-I", "idf_type": ["sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 2, "tag_param_no": 0, "state": "ok"}
+ccm_1        | 2021-09-02T12:38:05.181890882Z DEBUG:GRAPH:recv graph payload: {"op": "add_funcs", "state": "ok", "digests": ["c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9"]}
+ccm_1        | 2021-09-02T12:38:05.182584969Z DEBUG:GRAPH:recv graph payload: {"op": "add_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Alcohol-I", "idf_type": ["sample", "sample"], "func": "c833a6a2f3481aae827637b69ab50722744c049746fd635f9003ffebdcd051b9", "depends": {}, "param_no": 2, "tag_param_no": 0, "state": "ok"}
+csm_1        | 2021-09-02T12:38:05.194552102Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.194578746Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.328553277Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.328581480Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.410570649Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.410599862Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.488393911Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.488540646Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.562611404Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.562643084Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.638637245Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.638895937Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.766309674Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.766335651Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.844382648Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.844507926Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:05.973081345Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:05.973109598Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:06.015098029Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:06.015125345Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+csm_1        | 2021-09-02T12:38:06.091461140Z INFO:iottalk.conn:got malformated message
+csm_1        | 2021-09-02T12:38:06.091809739Z INFO:iottalk.conn:Device application 8777f56f-51be-43f9-b9ab-4d1eddda44a8 state: ok
+mosquitto_1  | 2021-09-02T12:38:06.603218136Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.603567794Z 1630586286: New client connected from 192.168.96.1 as esm-3 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.604511562Z INFO:iottalk.esm:ESM b'esm-3' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.605243533Z 1630586286: esm-3 2 iottalk/esm/6d6c0d82-89ad-45fa-8a56-c65de253d4f0
+mosquitto_1  | 2021-09-02T12:38:06.636741747Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.637427980Z 1630586286: New client connected from 192.168.96.1 as esm-5 (p2, c1, k60).
+mosquitto_1  | 2021-09-02T12:38:06.637981960Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.638291921Z 1630586286: New client connected from 192.168.96.1 as esm-4 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.638720501Z INFO:iottalk.esm:ESM b'esm-5' connect to mqtt broker with return code 0
+csm_1        | 2021-09-02T12:38:06.638755685Z INFO:iottalk.esm:ESM b'esm-4' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.639145578Z 1630586286: esm-4 2 iottalk/esm/722a7057-2e57-4dfb-8ab3-9f266b0bfd78
+mosquitto_1  | 2021-09-02T12:38:06.639557199Z 1630586286: esm-5 2 iottalk/esm/cc110f91-b590-464c-8f77-5eb4f6cb0bb0
+mosquitto_1  | 2021-09-02T12:38:06.641856552Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.642381661Z 1630586286: New client connected from 192.168.96.1 as esm-6 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.643680122Z INFO:iottalk.esm:ESM b'esm-6' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.644150301Z 1630586286: esm-6 2 iottalk/esm/6dd1cff8-5485-4229-91ee-988a427187d3
+mosquitto_1  | 2021-09-02T12:38:06.689526275Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.689688815Z 1630586286: New client connected from 192.168.96.1 as esm-7 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.690151310Z INFO:iottalk.esm:ESM b'esm-7' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.690608252Z 1630586286: esm-7 2 iottalk/esm/68a14bba-13e5-4e65-bed7-5f8d772cb202
+mosquitto_1  | 2021-09-02T12:38:06.731667145Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.732407579Z 1630586286: New client connected from 192.168.96.1 as esm-14 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.733289985Z INFO:iottalk.esm:ESM b'esm-14' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.733835657Z 1630586286: esm-14 2 iottalk/esm/24e35c5b-9ea3-457e-a84f-d221f6c358ff
+mosquitto_1  | 2021-09-02T12:38:06.763777435Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.764221261Z 1630586286: New client connected from 192.168.96.1 as esm-9 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.764922040Z INFO:iottalk.esm:ESM b'esm-9' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.765586661Z 1630586286: esm-9 2 iottalk/esm/ccae3fbd-733e-4d12-88b5-8a33ef31e4e0
+mosquitto_1  | 2021-09-02T12:38:06.766102598Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.766745408Z 1630586286: New client connected from 192.168.96.1 as esm-8 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.767366033Z INFO:iottalk.esm:ESM b'esm-8' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.768038604Z 1630586286: esm-8 2 iottalk/esm/8bb4eb7b-df3f-4b60-a571-674e7fedec9e
+mosquitto_1  | 2021-09-02T12:38:06.776603976Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.776707153Z 1630586286: New client connected from 192.168.96.1 as esm-12 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.777602737Z INFO:iottalk.esm:ESM b'esm-12' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.778143147Z 1630586286: esm-12 2 iottalk/esm/717951ec-5c0d-47cd-834a-2801b066b498
+mosquitto_1  | 2021-09-02T12:38:06.792304878Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.792662644Z 1630586286: New client connected from 192.168.96.1 as esm-13 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.793322422Z INFO:iottalk.esm:ESM b'esm-13' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.793922889Z 1630586286: esm-13 2 iottalk/esm/0051c2af-a111-4c9c-b0e5-cc22a92e8019
+mosquitto_1  | 2021-09-02T12:38:06.818471522Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.818754641Z 1630586286: New client connected from 192.168.96.1 as esm-10 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.819321557Z INFO:iottalk.esm:ESM b'esm-10' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.819698131Z 1630586286: esm-10 2 iottalk/esm/dac90751-1c1c-4cb8-84f7-1c739e9e5105
+mosquitto_1  | 2021-09-02T12:38:06.819783953Z 1630586286: New connection from 192.168.96.1 on port 1883.
+mosquitto_1  | 2021-09-02T12:38:06.820538247Z 1630586286: New client connected from 192.168.96.1 as esm-11 (p2, c1, k60).
+csm_1        | 2021-09-02T12:38:06.821149876Z INFO:iottalk.esm:ESM b'esm-11' connect to mqtt broker with return code 0
+mosquitto_1  | 2021-09-02T12:38:06.821698757Z 1630586286: esm-11 2 iottalk/esm/196b98ee-42d4-44c9-8f8b-6906f7011418
+nginx_1      | 2021-09-02T12:38:13.868550944Z 192.168.96.1 - - [02/Sep/2021:12:38:13 +0000] "GET /iottalk/ccm/api/v0/project/2 HTTP/1.1" 200 5364 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:13.868379436Z [pid: 18|app: 0|req: 18/18] 192.168.96.5 () {38 vars in 532 bytes} [Thu Sep  2 12:38:13 2021] GET /api/v0/project/2 => generated 5364 bytes in 81 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:13.949748705Z 192.168.96.1 - - [02/Sep/2021:12:38:13 +0000] "GET /iottalk/ccm/api/v0/project/2/deviceobject/4 HTTP/1.1" 200 6631 "-" "python-requests/2.21.0" "-"
+ccm_1        | 2021-09-02T12:38:13.949688102Z [pid: 18|app: 0|req: 19/19] 192.168.96.5 () {38 vars in 608 bytes} [Thu Sep  2 12:38:13 2021] GET /api/v0/project/2/deviceobject/4 => generated 6631 bytes in 77 msecs (HTTP/1.0 200) 6 headers in 309 bytes (1 switches on core 0)
+ccm_1        | 2021-09-02T12:38:13.983773278Z [pid: 18|app: 0|req: 20/20] 192.168.96.5 () {40 vars in 612 bytes} [Thu Sep  2 12:38:13 2021] POST /api/v0/project/2/deviceobject/4/device/unbind/ => generated 25 bytes in 14 msecs (HTTP/1.0 200) 6 headers in 307 bytes (1 switches on core 0)
+nginx_1      | 2021-09-02T12:38:13.983912419Z 192.168.96.1 - - [02/Sep/2021:12:38:13 +0000] "POST /iottalk/ccm/api/v0/project/2/deviceobject/4/device/unbind/ HTTP/1.1" 200 25 "-" "python-requests/2.21.0" "-"
+edutalk_1    | 2021-09-02T12:38:13.987180589Z INFO:werkzeug:192.168.96.5 - - [02/Sep/2021 12:38:13] "POST /lecture/4/rc/unbind/ HTTP/1.0" 200 -
+nginx_1      | 2021-09-02T12:38:13.988101771Z 219.91.48.114 - - [02/Sep/2021:12:38:13 +0000] "POST /lecture/4/rc/unbind/ HTTP/1.1" 200 15 "-" "okhttp/4.9.1" "-"
+ccm_1        | 2021-09-02T12:38:14.007033886Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider1", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.007269031Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider2", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.007472926Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider3", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.007679352Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider4", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.008255640Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "RangeSlider5", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.008314533Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Acceleration-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.008489077Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Gyroscope-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.008663607Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Orientation-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.009200361Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Magnetometer-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.009215450Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Humidity-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.009251488Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "UV-I", "state": "ok"}
+ccm_1        | 2021-09-02T12:38:14.009542583Z DEBUG:GRAPH:recv graph payload: {"op": "rm_link", "da_id": "8777f56f-51be-43f9-b9ab-4d1eddda44a8", "idf": "Alcohol-I", "state": "ok"}
+nginx_1      | 2021-09-02T12:38:14.052288859Z 219.91.48.114 - - [02/Sep/2021:12:38:14 +0000] "DELETE /iottalk/csm/8777f56f-51be-43f9-b9ab-4d1eddda44a8 HTTP/1.1" 200 61 "-" "Dalvik/2.1.0 (Linux; U; Android 11; SM-G9810 Build/RP1A.200720.012)" "-"
+csm_1        | 2021-09-02T12:38:14.052582120Z INFO:tornado.access:200 DELETE /8777f56f-51be-43f9-b9ab-4d1eddda44a8 (192.168.96.5) 2.04ms
+ccm_1        | 2021-09-02T12:38:14.054092541Z DEBUG:DEVICE:recv device payload: {"op": "anno", "type": "deregister", "timestamp": "a3d49b5e-0bea-11ec-acd4-0242c0a86006", "da": "8777f56f-51be-43f9-b9ab-4d1eddda44a8"}
+mosquitto_1  | 2021-09-02T12:38:14.057390131Z 1630586294: Client iottalk-py-8777f56f-51be-43f9-b9ab-4d1eddda44a8 disconnected.

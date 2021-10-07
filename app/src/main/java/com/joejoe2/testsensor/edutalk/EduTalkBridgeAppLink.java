@@ -1,48 +1,36 @@
 package com.joejoe2.testsensor.edutalk;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.joejoe2.testsensor.R;
 import com.joejoe2.testsensor.sa.EduTalkSmartphoneSA;
-import com.joejoe2.testsensor.sensor.SensorType;
+import com.joejoe2.testsensor.sensor.BaseSensorType;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensorType;
-import com.joejoe2.testsensor.sensor.triggersensor.RangeSensorType;
-import com.joejoe2.testsensor.utils.PermissionUtils;
+import com.joejoe2.testsensor.sensor.triggersensor.TriggerSensorType;
+import com.joejoe2.testsensor.utils.PermissionManager;
+import com.joejoe2.testsensor.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class EduTalkBridgeAppLink extends AppCompatActivity {
-    String CSMEndpoint;
-    String deviceName, deviceModel;
-    String BIND_RC_URL;
     EduTalkRCConfig eduTalkRCConfig;
-    HashMap<String, SensorType> selectedSensors = new HashMap<>();
-    final Integer[] SAMPLE_RATES = new Integer[]{1, 10, 25, 50, 100, 200};
+    HashMap<String, BaseSensorType> supportedDFSenosrs = new HashMap<>();
+    final Integer[] SAMPLE_RATES = new Integer[]{1, 10, 25, 50, 100, 200, 300, 400, -1};
 
     TextView applinkTextView;
     Button startSAButton;
@@ -53,67 +41,48 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_link);
-        PermissionUtils.requestPermissions(this, PermissionUtils.getLackingPermissions(this));
-
-        //use firebase DynamicLinks to open app, and receive query param
-        FirebaseApp.initializeApp(this);
-        FirebaseDynamicLinks.getInstance()
-                .getDynamicLink(getIntent())
-                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
-                    @Override
-                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
-                        onReceivedAppLink(pendingDynamicLinkData);
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                        terminateWithError();
-                    }
-                });
+        PermissionManager.requestPermissions(this, PermissionManager.getLackingPermissions(this));
+        //use chrome based intent to open app, and receive query param
+        onReceivedAppLink(getIntent().getData());
     }
 
-    private void onReceivedAppLink(PendingDynamicLinkData pendingDynamicLinkData){
-        //link format: (should be encoded !)
-        // https://edutalkapp.page.link/?link=https://joejoe2.github.io/applink/edutalk/Smartphone
+    private void onReceivedAppLink(Uri appLink){
+        //link format: (?data should be encoded !)
+        // https://joejoe2.github.io/applink/edutalk/Smartphone
         // ?data=http%3A%2F%2Fphyedu.iottalk.tw%2Flecture%2F6%2Frc%2F%3Ftoken%3D99d42d77825346e4ad24a7653c06ffdb
-        // &apn=com.joejoe2.testsensor
-        // &afl=https://play.google.com/store/apps/details?id%3Dgogolook.callgogolook2
-        // &efr=1
-        // the query param "data" is in format (some rc index):
+        // the query param "data" is in format (rc index):
         // http://phyedu.iottalk.tw/lecture/6/rc/?token=99d42d77825346e4ad24a7653c06ffdb !!!
-        PendingDynamicLinkData appLinkData = pendingDynamicLinkData;
+        System.out.println(appLink);
         new Thread(()->{
             try {
                 //receive param
-                String rc_index_url = Uri.decode(appLinkData.getLink().getQueryParameter("data"));
+                String rc_index_url = Uri.decode(appLink.getQueryParameter("data"));
                 //get to rc_index_url to retrieve eduTalkRCConfig
-                eduTalkRCConfig=EduTalkService.getRCConfig(rc_index_url);
-                CSMEndpoint = eduTalkRCConfig.csm_url;
-                selectedSensors = getSelectedSensorsFromData(new JSONArray(eduTalkRCConfig.idf_list));
-                deviceName=eduTalkRCConfig.device_name;
-                deviceModel=eduTalkRCConfig.device_model;
-                BIND_RC_URL=eduTalkRCConfig.rc_bind;
+                //eduTalkRCConfig = EduTalkService.fetchRCConfig(rc_index_url);
+                eduTalkRCConfig = EduTalkService.fetchRCConfigNew(rc_index_url+"&app=true");
+                supportedDFSenosrs = DFtoSensors(new JSONArray(eduTalkRCConfig.idf_list));
             }catch (Exception e){
                 e.printStackTrace();
-                terminateWithError();
-            }finally {
-                runOnUiThread(()->{
-                    setUI();
-                    setListeners();
-                });
+                runOnUiThread(EduTalkBridgeAppLink.this::terminateWithError);
             }
+
+            runOnUiThread(()->{
+                setUI();
+                setListeners();
+            });
         }).start();
     }
 
     private void setUI(){
         applinkTextView = findViewById(R.id.applinkTextView);
-        applinkTextView.setText("supported features are ready:\n\n"+selectedSensors.keySet());
+
+        applinkTextView.setText("supported features are ready:\n\n"+ supportedDFSenosrs.keySet());
+
         sampleRateSpinner = findViewById(R.id.sampleRateSpinner);
-        sampleRateSpinner.setAdapter(new ArrayAdapter<Integer>(this,
+        sampleRateSpinner.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, SAMPLE_RATES));
         sampleRateSpinner.setSelection(0);
+
         startSAButton = findViewById(R.id.startSAButton);
     }
 
@@ -121,19 +90,16 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
         startSAButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> lackingPermissions= PermissionUtils.getLackingPermissions(EduTalkBridgeAppLink.this);
+                ArrayList<String> lackingPermissions= PermissionManager.getLackingPermissions(EduTalkBridgeAppLink.this);
                 if (lackingPermissions.size()>0){
-                    PermissionUtils.requestPermissionsInSetting(EduTalkBridgeAppLink.this, lackingPermissions);
+                    PermissionManager.requestPermissionsInSetting(EduTalkBridgeAppLink.this, lackingPermissions);
                     return;
                 }
 
                 Intent saActivity=new Intent().setClass(EduTalkBridgeAppLink.this, EduTalkSmartphoneSA.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("CSMEndpoint", CSMEndpoint);
-                bundle.putString("deviceModel", deviceModel);
-                bundle.putString("deviceName", deviceName);
-                bundle.putSerializable("selectedSensors", selectedSensors);
-                bundle.putString("BIND_RC_URL", BIND_RC_URL);
+                bundle.putSerializable("eduTalkRCConfig", eduTalkRCConfig);
+                bundle.putSerializable("selectedSensors", supportedDFSenosrs);
                 bundle.putInt("sampleRate", (Integer) sampleRateSpinner.getSelectedItem());
                 saActivity.putExtras(bundle);
                 startActivity(saActivity);
@@ -142,48 +108,47 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
         });
     }
 
-    private HashMap<String, SensorType> getSelectedSensorsFromData(JSONArray idfs) throws JSONException {
-        HashMap<String, SensorType>sensors=new HashMap<>();
+    private HashMap<String, BaseSensorType> DFtoSensors(JSONArray idfs) throws JSONException {
+        HashMap<String, BaseSensorType> df2sensors=new HashMap<>();
 
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         outer:
         for (int i =0; i<idfs.length(); i++){
-            String dfName=idfs.getJSONArray(i).getString(0);
-            //check is in StreamSensorType
-            for (StreamSensorType sensorType: StreamSensorType.values()) {
-                if (dfName.contains(sensorType.semanticAlias())){
-                    /****************************************
-                    * there is a mismatch bug in edutalk !!!
-                     * so replace _ with - temporarily,
-                     * and notice that edutalk need timestamp in StreamSensor !
-                     * ***************************************
-                    * */
-                    sensors.put(dfName.replace("_", "-"), new SensorType(sensorType, true));
+            /****************************************
+             * there is a mismatch dfName in edutalk (idf_list vs joins) !!!
+             * so replace _ with - temporarily
+             * ***************************************
+             * */
+            String dfName=idfs.getJSONArray(i).getString(0).replace("_", "-");
+            //check df is in StreamSensorType
+            for (StreamSensorType streamSensorType: StreamSensorType.values()) {
+                if (dfName.contains(streamSensorType.getDFAlias())&&Utils.isSensorAvailable(sensorManager, streamSensorType.getNativeSensorCode())){
+                    streamSensorType.setNeedTimestamp(true);
+                    df2sensors.put(dfName, streamSensorType);
                     continue outer;
                 }
             }
-            //check is in RangeSensorType
-            for (RangeSensorType sensorType: RangeSensorType.values()) {
-                if (dfName.contains(sensorType.semanticAlias())){
-                    sensors.put(dfName, new SensorType(sensorType));
+            //check df is in RangeSensorType
+            for (TriggerSensorType triggerSensorType: TriggerSensorType.values()) {
+                if (dfName.contains(triggerSensorType.getDFAlias())){
+                    df2sensors.put(dfName, triggerSensorType);
                     continue outer;
                 }
             }
         }
-        return sensors;
+        return df2sensors;
     }
 
     private void terminateWithError(){
-        runOnUiThread(()->{
-            AlertDialog.Builder builder=new AlertDialog.Builder(this);
-            builder.setTitle("there are some errors in your app link !");
-            builder.setPositiveButton("exit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    EduTalkBridgeAppLink.this.finish();
-                }
-            });
-            builder.setCancelable(false);
-            builder.create().show();
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle("there are some errors in your app link !");
+        builder.setPositiveButton("exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EduTalkBridgeAppLink.this.finish();
+            }
         });
+        builder.setCancelable(false);
+        builder.create().show();
     }
 }

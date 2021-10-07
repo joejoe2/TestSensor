@@ -9,5 +9,5 @@ package com.joejoe2.testsensor.sensor;
  * please use asyn or thread manner, otherwise the dataConsumer will be blocked util your work done.
  */
 public interface OnConsumeCallback {
-    public void consume(float[] sensorData);
+    public long consume(float[] sensorData);
 }

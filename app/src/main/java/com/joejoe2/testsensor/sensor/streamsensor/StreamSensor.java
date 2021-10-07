@@ -5,9 +5,11 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.joejoe2.testsensor.sensor.SensorBase;
-import com.joejoe2.testsensor.sensor.SensorType;
+import com.joejoe2.testsensor.sensor.BaseSensor;
+import com.joejoe2.testsensor.sensor.BaseSensorType;
+import com.joejoe2.testsensor.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
 
@@ -18,11 +20,12 @@ import java.util.concurrent.locks.LockSupport;
  * <br><br>
  * sensorType is bind with iottalk input device feature<br>
  * onSignalCallback is called when android sensor get a value<br>
- * consumable is a interface to defined how to process a value retrieve from dataQueue
+ * onConsumeCallback is called to process a value retrieve from dataQueue
  */
-public class StreamSensor extends SensorBase {
+public class StreamSensor extends BaseSensor {
     private SensorManager sensorManager;
     private Sensor sensor;
+    private StreamSensorType streamSensorType;
     private SensorEventListener sensorEventListener;
     private int sampleRate;
     private long consumeIntervalNS;
@@ -31,20 +34,23 @@ public class StreamSensor extends SensorBase {
     private Thread dataConsumer;
     private boolean isDataConsumerExit;
 
-    public StreamSensor(String id, SensorManager sensorManager, SensorType sensorType, int sampleRate) {
-        super(id, sensorType);
+    private ArrayList<Long> sampleTime=new ArrayList<>();
+    private ArrayList<Long> sendTime=new ArrayList<>();
+
+    public StreamSensor(String id, SensorManager sensorManager, StreamSensorType streamSensorType, int sampleRate) {
+        super(id, streamSensorType);
+        this.streamSensorType = (StreamSensorType) super.baseSensorType;
         this.sensorManager = sensorManager;
         this.sampleRate = sampleRate>=100?sampleRate+10:sampleRate; // avoid sensor lazy(a little bit smaller than 200) on 5z
-        this.consumeIntervalNS = getConsumeIntervalNS(sampleRate);
-        this.sensor = this.sensorManager.getDefaultSensor(this.sensorType.getStreamSensorType().getValue());
+        this.consumeIntervalNS = getConsumeIntervalNS(this.sampleRate);
+        this.sensor = this.sensorManager.getDefaultSensor(this.streamSensorType.getNativeSensorCode());
     }
 
     @Override
     public void start(){
-        dataQueue = new ConcurrentLinkedQueue<>();
+        this.dataQueue = new ConcurrentLinkedQueue<>();
         startSensing();
         startConsuming();
-        System.out.println(id+"("+sensorType.getStreamSensorType().semanticAlias()+") stared");
     }
 
     @Override
@@ -52,7 +58,8 @@ public class StreamSensor extends SensorBase {
         this.sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
-                float[] data = sensorType.getStreamSensorType().convertToAcceptUnit(sensorEvent.values);
+                sampleTime.add(System.currentTimeMillis());
+                float[] data = streamSensorType.convertToAcceptUnit(sensorEvent.values);
                 onSignalCallback.doOnSignal(data);
                 dataQueue.add(data);
             }
@@ -66,10 +73,12 @@ public class StreamSensor extends SensorBase {
     @Override
     protected void startConsuming(){
         dataConsumer = new Thread(() -> {
+            long t;
             while (!isDataConsumerExit) {
                 float[] data;
                 if ((data = dataQueue.poll())!=null){
-                    onConsumeCallback.consume(data);
+                    t = onConsumeCallback.consume(data);
+                    sendTime.add(t);
                 }else {
                     LockSupport.parkNanos(consumeIntervalNS);
                 }
@@ -82,7 +91,10 @@ public class StreamSensor extends SensorBase {
     public void stop(){
         stopSensing();
         stopConsuming();
-        System.out.println(id+"("+sensorType.getStreamSensorType().semanticAlias()+") stopped");
+        if (sampleTime.size() - sendTime.size() > 0) {
+            sampleTime.subList(0, sampleTime.size() - sendTime.size()).clear();
+        }
+        Utils.saveTimeStampData(sampleTime, sendTime, System.currentTimeMillis()+"_"+getId());
     }
 
     @Override
@@ -94,7 +106,7 @@ public class StreamSensor extends SensorBase {
     protected void stopConsuming(){
         isDataConsumerExit = true;
         dataConsumer = null;
-        dataQueue = null;
+        dataQueue.clear();
     }
 
     private int getSamplePeriodUS(int sampleRate){

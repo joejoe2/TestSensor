@@ -1,22 +1,22 @@
 package com.joejoe2.testsensor.sensor;
 
-public abstract class SensorBase {
+public abstract class BaseSensor {
     protected String id;
     public String getId(){
         return id;
     }
-    protected SensorType sensorType;
-    public SensorType getSensorType() {
-        return sensorType;
+    protected BaseSensorType baseSensorType;
+    public BaseSensorType getBaseSensorType() {
+        return baseSensorType;
     }
     protected OnSignalCallBack onSignalCallback;
     protected OnConsumeCallback onConsumeCallback;
 
-    public SensorBase(String id, SensorType sensorType) {
+    public BaseSensor(String id, BaseSensorType baseSensorType) {
         this.id = id;
-        this.sensorType = sensorType;
+        this.baseSensorType = baseSensorType;
         this.onSignalCallback = (float[] sensorData) -> {}; //do nothing...
-        this.onConsumeCallback = (float[] sensorData) -> {}; //do nothing...
+        this.onConsumeCallback = (float[] sensorData) -> {return 0;}; //do nothing...
     }
 
     public void setOnSensorSignalCallBack(OnSignalCallBack onSignalCallback){

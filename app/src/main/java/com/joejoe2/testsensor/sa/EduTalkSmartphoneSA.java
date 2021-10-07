@@ -2,7 +2,7 @@ package com.joejoe2.testsensor.sa;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -13,14 +13,22 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.joejoe2.testsensor.customUI.CustomUIFactory;
 import com.joejoe2.testsensor.customUI.MutliDimesionDataText;
 import com.joejoe2.testsensor.customUI.SeekBarWithLabel;
 import com.joejoe2.testsensor.edutalk.EduTalkDAI;
 import com.joejoe2.testsensor.R;
-import com.joejoe2.testsensor.sensor.SensorBase;
-import com.joejoe2.testsensor.sensor.SensorType;
+import com.joejoe2.testsensor.edutalk.EduTalkRCConfig;
+import com.joejoe2.testsensor.sensor.BaseSensor;
+import com.joejoe2.testsensor.sensor.BaseSensorType;
 import com.joejoe2.testsensor.sensor.streamsensor.StreamSensor;
+import com.joejoe2.testsensor.sensor.streamsensor.StreamSensorType;
 import com.joejoe2.testsensor.sensor.triggersensor.RangeSensor;
+import com.joejoe2.testsensor.sensor.triggersensor.TriggerSensorType;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +38,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class EduTalkSmartphoneSA extends AppCompatActivity {
-    String CSMEndpoint;
-    String deviceName, deviceModel;
-    String BIND_RC_URL;
+    EduTalkRCConfig eduTalkRCConfig;
     int sampleRate;
 
-    HashMap<String, SensorType> selectedSensorTypes = new HashMap<>();
-    SensorBase[] selectedSensors;
+    HashMap<String, BaseSensorType> selectedSensorTypes = new HashMap<>();
+    BaseSensor[] selectedSensors;
     EduTalkDAI dai;
     Network originalNetwork;
     ConnectivityManager connectivityManager;
@@ -44,8 +50,8 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
 
     Button exitButton;
     TextView deviceModelTexView, deviceNameTexView;
-    ScrollView dataView;
-    LinearLayout dataLayout;
+    ScrollView sensorDataView;
+    LinearLayout sensorDataLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,81 +74,84 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
      */
     void getBundle(){
         Bundle bundle = this.getIntent().getExtras();
-        CSMEndpoint = bundle.getString("CSMEndpoint");
-        deviceModel = bundle.getString("deviceModel");
-        deviceName = bundle.getString("deviceName");
-        selectedSensorTypes = (HashMap<String, SensorType>) bundle.getSerializable("selectedSensors");
-        BIND_RC_URL = bundle.getString("BIND_RC_URL");
+        eduTalkRCConfig = (EduTalkRCConfig) bundle.getSerializable("eduTalkRCConfig");
+        selectedSensorTypes = (HashMap<String, BaseSensorType>) bundle.getSerializable("selectedSensors");
         sampleRate = bundle.getInt("sampleRate", 1);
     }
 
     private void setUI(){
         exitButton = findViewById(R.id.exitButton);
         deviceModelTexView = findViewById(R.id.deviceModelTextView);
-        deviceModelTexView.setText(deviceModel);
+        deviceModelTexView.setText(eduTalkRCConfig.device_model);
         deviceNameTexView = findViewById(R.id.deviceNameTextView);
-        deviceNameTexView.setText(deviceName);
-        dataView = findViewById(R.id.scrollView);
-        dataLayout=findViewById(R.id.dataLayout);
+        deviceNameTexView.setText(eduTalkRCConfig.device_name);
+        sensorDataView = findViewById(R.id.scrollView);
+        sensorDataLayout =findViewById(R.id.dataLayout);
     }
 
     private void setDAI(){
-        selectedSensors = getSensors(selectedSensorTypes);
-        dai = new EduTalkDAI(CSMEndpoint, BIND_RC_URL, deviceName, deviceModel, selectedSensors);
+        try {
+            selectedSensors = getSensors(selectedSensorTypes);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.device_name, eduTalkRCConfig.device_model, selectedSensors);
     }
 
-    private SensorBase[] getSensors(HashMap<String, SensorType> selectedSensorTypes){
-        ArrayList<SensorBase> sensors = new ArrayList<>();
+    private BaseSensor[] getSensors(HashMap<String, BaseSensorType> selectedSensorTypes) throws JSONException {
+        ArrayList<BaseSensor> sensors = new ArrayList<>();
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        JSONArray joins = new JSONArray(eduTalkRCConfig.joins);
+        for(int i=0; i<joins.length();i++){
+            JSONObject join = joins.getJSONObject(i);
+            String idfName = join.getString("idf");
+            String odfName = join.getString("odf").replace("-O", "");
+            BaseSensorType baseSensorType = (BaseSensorType) selectedSensorTypes.get(idfName);
+            BaseSensor sensor = null;
 
-        selectedSensorTypes.forEach((String id, SensorType sensorType) -> {
-            SensorBase sensor=null;
-            if (sensorType.isStreamSensor()){
-                MutliDimesionDataText dataText = buildMutlDimesionDataText(id+
-                        " ( "+sensorType.getStreamSensorType().getUnit()+" )", sensorType.getStreamSensorType().getDataDimensions());
-                sensor = new StreamSensor(id, sensorManager, sensorType, sampleRate);
-                sensor.setOnSensorSignalCallBack((float[] data) -> {
-                    runOnUiThread(()->{
+            if (baseSensorType instanceof StreamSensorType){
+                StreamSensorType streamSensorType = (StreamSensorType) baseSensorType;
+                //build ui
+                MutliDimesionDataText dataText = CustomUIFactory.buildMutlDimesionDataText(this, idfName+
+                        " ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensions());
+                sensorDataLayout.addView(dataText);
+
+                //create sensor and update ui method
+                sensor = new StreamSensor(idfName, sensorManager, streamSensorType, sampleRate);
+                sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(() ->
                         dataText.setValues(IntStream.range(0, data.length)
-                                .mapToObj(i -> String.format("%.2f", data[i]))
-                                .toArray(String[]::new));
-                    });
-                });
-            }else if (sensorType.isRangeSensor()){
-                SeekBarWithLabel seekBarWithLabel = buildSeekBarWithLabel(id);
-                float step=0.01f;
-                int stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
-                sensor = new RangeSensor(id, seekBarWithLabel, sensorType, 0, 10, step, 5);
-                sensor.setOnSensorSignalCallBack((float[] data) -> {
-                    runOnUiThread(()->{
-                        seekBarWithLabel.setValue(String.format("%."+stepPrecision+"f", data[0]));
-                    });
-                });
+                                .mapToObj(index -> String.format("%.2f", data[index]))
+                                .toArray(String[]::new))));
+
+            }else if (baseSensorType instanceof TriggerSensorType){
+                TriggerSensorType triggerSensorType = (TriggerSensorType) baseSensorType;
+                if (triggerSensorType == TriggerSensorType.RangeSlider){
+                    //build ui
+                    SeekBarWithLabel seekBarWithLabel = CustomUIFactory.buildSeekBarWithLabel(this, odfName);
+                    sensorDataLayout.addView(seekBarWithLabel);
+
+                    //create sensor and update ui method
+                    float step=0.01f; //need to change !
+                    int stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
+                    sensor = new RangeSensor(idfName, seekBarWithLabel, triggerSensorType,
+                            join.getInt("min"), join.getInt("max"), step, join.getInt("default"));
+                    sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(()-> seekBarWithLabel.setValue(String.format("%."+stepPrecision+"f", data[0]))));
+                }else{
+                    //add new TriggerSensor here ...
+                }
+            }else{
+                //add new sensor type here...
             }
-
             if (sensor!=null)sensors.add(sensor);
-        });
+        }
 
-        return sensors.toArray(new SensorBase[0]);
-    }
-
-    private MutliDimesionDataText buildMutlDimesionDataText(String title, String[] dimensionNames){
-        MutliDimesionDataText dataText= new MutliDimesionDataText(this, title, dimensionNames, 18, 22, Color.WHITE);
-        dataLayout.addView(dataText);
-        return dataText;
-    }
-
-    private SeekBarWithLabel buildSeekBarWithLabel(String title){
-        SeekBarWithLabel seekBar = new SeekBarWithLabel(this, title, 18, 22, Color.WHITE);
-        dataLayout.addView(seekBar);
-        return seekBar;
+        return sensors.toArray(new BaseSensor[0]);
     }
 
     private void setListeners(){
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dai.stop();
                 exit();
             }
         });
@@ -185,7 +194,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
 
     @Override
     public void onStop() {
-        for (SensorBase sensor : selectedSensors) {
+        for (BaseSensor sensor : selectedSensors) {
             sensor.stopSensing();
         }
         super.onStop();
@@ -194,7 +203,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
     @Override
     public void onRestart() {
         super.onRestart();
-        for (SensorBase sensor : selectedSensors) {
+        for (BaseSensor sensor : selectedSensors) {
             sensor.startSensing();
         }
     }
@@ -206,7 +215,6 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         builder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                dai.stop();
                 exit();
             }
         });
@@ -219,23 +227,26 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         dialog.show();
     }
 
+    private boolean hasDestroy;
+
     @Override
     protected void onDestroy() {
-        dai.stop();
-        //clear connectivityManager
-        connectivityManager.unregisterNetworkCallback(onNetworkStateChangeCallback);
+        if (!hasDestroy){
+            dai.stop();
+            //clear connectivityManager
+            connectivityManager.unregisterNetworkCallback(onNetworkStateChangeCallback);
+            hasDestroy=true;
+        }
         super.onDestroy();
     }
 
-    /**
-     * exit app
-     */
     void exit(){
-        //finishAffinity will not call on destroy onDestroy is for sys to call
-        dai.stop();
-        //clear connectivityManager
-        connectivityManager.unregisterNetworkCallback(onNetworkStateChangeCallback);
-        //exit
-        finishAffinity();
+        if (!hasDestroy){
+            dai.stop();
+            //clear connectivityManager
+            connectivityManager.unregisterNetworkCallback(onNetworkStateChangeCallback);
+            hasDestroy=true;
+        }
+        finishAndRemoveTask();
     }
 }

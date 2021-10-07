@@ -1,28 +1,26 @@
 package com.joejoe2.testsensor.sensor.triggersensor;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.SeekBar;
 
 import com.joejoe2.testsensor.customUI.SeekBarWithLabel;
-import com.joejoe2.testsensor.sensor.SensorBase;
-import com.joejoe2.testsensor.sensor.SensorType;
+import com.joejoe2.testsensor.sensor.BaseSensor;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class RangeSensor extends SensorBase {
+public class RangeSensor extends BaseSensor {
     private View uiComponent;
     private float min, max,  step, defaultVal;
     private int stepPrecision;
 
     private boolean isSensing;
     private long consumeIntervalMS = 50;
-    public ConcurrentLinkedQueue<float[]> dataQueue;
+    private ConcurrentLinkedQueue<float[]> dataQueue;
     private Thread dataConsumer;
     private boolean dataConsumerExit;
 
-    public RangeSensor(String id, View uiComponent , SensorType sensorType, float min, float max, float step, float defaultVal) {
-        super(id, sensorType);
+    public RangeSensor(String id, View uiComponent , TriggerSensorType triggerSensorType, float min, float max, float step, float defaultVal) {
+        super(id, triggerSensorType);
         this.uiComponent = uiComponent;
         this.min = min;
         this.max = max;
@@ -36,12 +34,11 @@ public class RangeSensor extends SensorBase {
         dataQueue = new ConcurrentLinkedQueue<>();
         startSensing();
         startConsuming();
-        System.out.println(id+" Sensor started");
     }
 
     @Override
     public void startSensing() {
-        if (uiComponent.getClass().getCanonicalName().equals(RangeSensorType.RangeSlider.getValue())){
+        if (uiComponent.getClass().getCanonicalName().equals(TriggerSensorType.RangeSlider.getCorrespondingUI())){
             SeekBarWithLabel seekBar = ((SeekBarWithLabel) uiComponent);
             seekBar.setSeekBarRange((int) (1.0/step*(max-min)), (int) (defaultVal/step+min));
             seekBar.setValue(String.format("%."+stepPrecision+"f", defaultVal+min));
@@ -85,7 +82,6 @@ public class RangeSensor extends SensorBase {
     public void stop() {
         stopSensing();
         stopConsuming();
-        System.out.println(id+" Sensor stopped");
     }
 
     @Override

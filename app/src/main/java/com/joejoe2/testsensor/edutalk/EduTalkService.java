@@ -3,6 +3,8 @@ package com.joejoe2.testsensor.edutalk;
 import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +24,9 @@ public class EduTalkService {
     private static final HashMap<String, List<Cookie>> cookieStore = new HashMap<>();
 
     static {
+        /*
+        * store cookies statically
+        * */
         httpClient=new OkHttpClient().newBuilder()
                 .cookieJar(new CookieJar() {
                     @Override
@@ -40,27 +45,32 @@ public class EduTalkService {
                 .build();
     }
 
-    public static EduTalkRCConfig getRCConfig(String url){
+    public static EduTalkRCConfig fetchRCConfig(String url) throws IOException, JSONException {
         //ex. http://phyedu.iottalk.tw/lecture/6/rc/?token=99d42d77825346e4ad24a7653c06ffdb
         Request request = new Request.Builder().url(url).build();
-        try {
-            Response response = httpClient.newCall(request).execute();
-            EduTalkRCConfig eduTalkRCConfig = new EduTalkRCConfig(response.body().string());
-            response.close();
-            return eduTalkRCConfig;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        Response response = httpClient.newCall(request).execute();
+        EduTalkRCConfig eduTalkRCConfig = new EduTalkRCConfig(response.body().string());
+        response.close();
+        return eduTalkRCConfig;
+    }
+
+    public static EduTalkRCConfig fetchRCConfigNew(String url) throws IOException, JSONException {
+        //ex. http://phyedu.iottalk.tw/lecture/6/rc/?token=99d42d77825346e4ad24a7653c06ffdb
+        Request request = new Request.Builder().url(url).build();
+        Response response = httpClient.newCall(request).execute();
+        EduTalkRCConfig eduTalkRCConfig = new EduTalkRCConfig(new JSONObject(response.body().string()));
+        response.close();
+        return eduTalkRCConfig;
     }
 
     public static boolean bindRC(String url, String deviceID){
         Request request = new Request.Builder().url(url+deviceID).post(RequestBody.create(null, new byte[0])).build();
+        System.out.println(url);
         try {
             Response response = httpClient.newCall(request).execute();
             String res = response.body().string();
             response.close();
-            System.out.println(res);
+            System.out.println("rc_bind: "+res);
             return res.equals("{\"state\":\"ok\"}");
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +84,7 @@ public class EduTalkService {
             Response response = httpClient.newCall(request).execute();
             String res = response.body().string();
             response.close();
-            System.out.println(res);
+            System.out.println("rc_unbind: "+res);
             return res.equals("{\"state\":\"ok\"}");
         } catch (IOException e) {
             e.printStackTrace();
