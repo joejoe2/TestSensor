@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.joejoe2.testsensor">
+    package="com.edutalk.app">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".edutalk.EduTalkBridgeAppLink" android:configChanges="orientation|screenSize|screenLayout">
+        <activity android:name="com.edutalk.app.edutalk.EduTalkBridgeAppLink" android:configChanges="orientation|screenSize|screenLayout">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -32,17 +32,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".sa.IoTTalkSmartphoneSA"
+            android:name="com.edutalk.app.sa.IoTTalkSmartphoneSA"
             android:configChanges="orientation|screenSize|screenLayout"
             android:keepScreenOn="true"
             android:resizeableActivity="false" />
         <activity
-            android:name=".sa.EduTalkSmartphoneSA"
+            android:name="com.edutalk.app.sa.EduTalkSmartphoneSA"
             android:configChanges="orientation|screenSize|screenLayout"
             android:keepScreenOn="true"
             android:resizeableActivity="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.edutalk.app.MainActivity"
             android:keepScreenOn="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
