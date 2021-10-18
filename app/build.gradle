@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.joejoe2.testsensor"
+        applicationId "com.edutalk.app"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 2
