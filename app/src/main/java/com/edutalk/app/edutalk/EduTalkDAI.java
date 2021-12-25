@@ -103,7 +103,7 @@ public class EduTalkDAI {
                 for (BaseSensor sensor : sensors) {
                     sensor.stop();
                 }
-                EduTalkService.unBindRC(BIND_RC_URL.replace("bind", "unbind"));
+                EduTalkService.unBindRC(BIND_RC_URL.replace("bind", "unbind")); //useless ?
                 dan.disconnect();
                 System.out.println("DAI stopped");
             } catch (Exception e) {

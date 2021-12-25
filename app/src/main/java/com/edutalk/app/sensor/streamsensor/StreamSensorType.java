@@ -33,7 +33,7 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
         }
     }
 
-    public String[] getDataDimensions(){
+    public String[] getDataDimensionNames(){
         switch (this){
             case Acceleration:
             case Magnetometer:
@@ -42,7 +42,7 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
             case Orientation:
                 return new String[]{"α", "β", "γ"};
             default:
-                throw new Error("undefined output of SensorType !");
+                throw new Error("undefined DimensionNames of SensorType !");
         }
     }
 
@@ -62,8 +62,11 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
                     res[i] = (float)(data[i]*180/Math.PI);
                 }
                 break;
-            default:
-                throw new Error("undefined convert of SensorType !");
+            default: //same
+                for (int i=0;i<3;i++){
+                    res[i] = data[i];
+                }
+                //throw new Error("undefined convert of SensorType !");
         }
 
         return res;

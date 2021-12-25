@@ -24,6 +24,7 @@ import com.edutalk.app.sensor.streamsensor.StreamSensor;
 import com.edutalk.app.sensor.streamsensor.StreamSensorType;
 import com.edutalk.app.sensor.triggersensor.RangeSensor;
 import com.edutalk.app.sensor.triggersensor.TriggerSensorType;
+import com.edutalk.app.utils.LinkedMapForIntent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import androidx.appcompat.app.AlertDialog;
@@ -40,7 +43,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
     EduTalkRCConfig eduTalkRCConfig;
     int sampleRate;
 
-    HashMap<String, BaseSensorType> selectedSensorTypes = new HashMap<>();
+    LinkedHashMap<String, BaseSensorType> selectedSensorTypes = new LinkedHashMap<>();
     BaseSensor[] selectedSensors;
     EduTalkDAI dai;
     Network originalNetwork;
@@ -74,7 +77,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
     void getBundle(){
         Bundle bundle = this.getIntent().getExtras();
         eduTalkRCConfig = (EduTalkRCConfig) bundle.getSerializable("eduTalkRCConfig");
-        selectedSensorTypes = (HashMap<String, BaseSensorType>) bundle.getSerializable("selectedSensors");
+        selectedSensorTypes = (LinkedHashMap<String, BaseSensorType>)((LinkedMapForIntent) bundle.getSerializable("selectedSensors")).getMap();
         sampleRate = bundle.getInt("sampleRate", 1);
     }
 
@@ -97,22 +100,30 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.device_name, eduTalkRCConfig.device_model, selectedSensors);
     }
 
-    private BaseSensor[] getSensors(HashMap<String, BaseSensorType> selectedSensorTypes) throws JSONException {
+    private BaseSensor[] getSensors(LinkedHashMap<String, BaseSensorType> selectedSensorTypes) throws JSONException {
         ArrayList<BaseSensor> sensors = new ArrayList<>();
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        JSONArray joins = new JSONArray(eduTalkRCConfig.joins);
-        for(int i=0; i<joins.length();i++){
-            JSONObject join = joins.getJSONObject(i);
-            String idfName = join.getString("idf");
-            String odfName = join.getString("odf").replace("-O", "");
-            BaseSensorType baseSensorType = (BaseSensorType) selectedSensorTypes.get(idfName);
-            BaseSensor sensor = null;
 
-            if (baseSensorType instanceof StreamSensorType){
-                StreamSensorType streamSensorType = (StreamSensorType) baseSensorType;
+        JSONArray joins = new JSONArray(eduTalkRCConfig.joins);
+        for(Map.Entry<String, BaseSensorType> selectedSensorType: selectedSensorTypes.entrySet()){
+            //get idfName, odfName, join, sensorType
+            String idfName = selectedSensorType.getKey();
+            BaseSensorType sensorType = selectedSensorType.getValue();
+            JSONObject join = null;
+            for (int i=0;i<joins.length();i++){
+                if (idfName.equals(joins.getJSONObject(i).getString("idf")))
+                    join = joins.getJSONObject(i);
+            }
+            if (join==null)continue;
+            String odfName = join.getString("odf");
+
+            //create sensor
+            BaseSensor sensor = null;
+            if (sensorType instanceof StreamSensorType){
+                StreamSensorType streamSensorType = (StreamSensorType) sensorType;
                 //build ui
                 MutliDimesionDataText dataText = CustomUIFactory.buildMutlDimesionDataText(this, idfName+
-                        " ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensions());
+                        " ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
                 sensorDataLayout.addView(dataText);
 
                 //create sensor and update ui method
@@ -122,15 +133,15 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                                 .mapToObj(index -> String.format("%.2f", data[index]))
                                 .toArray(String[]::new))));
 
-            }else if (baseSensorType instanceof TriggerSensorType){
-                TriggerSensorType triggerSensorType = (TriggerSensorType) baseSensorType;
+            }else if (sensorType instanceof TriggerSensorType){
+                TriggerSensorType triggerSensorType = (TriggerSensorType) sensorType;
                 if (triggerSensorType == TriggerSensorType.RangeSlider){
                     //build ui
                     SeekBarWithLabel seekBarWithLabel = CustomUIFactory.buildSeekBarWithLabel(this, odfName);
                     sensorDataLayout.addView(seekBarWithLabel);
 
                     //create sensor and update ui method
-                    float step=0.01f; //need to change !
+                    float step=0.01f; // configurable ?
                     int stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
                     sensor = new RangeSensor(idfName, seekBarWithLabel, triggerSensorType,
                             join.getInt("min"), join.getInt("max"), step, join.getInt("default"));

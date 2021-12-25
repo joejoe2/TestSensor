@@ -98,7 +98,7 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
         for (StreamSensorType streamSensorType: selectedSensors) {
             //build ui
             MutliDimesionDataText dataText= CustomUIFactory.buildMutlDimesionDataText(this,
-                    streamSensorType.getDFAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensions());
+                    streamSensorType.getDFAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
             sensorDataLayout.addView(dataText);
 
             //create sensor and update method

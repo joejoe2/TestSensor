@@ -1,14 +1,10 @@
 package com.edutalk.app.edutalk;
 
 import androidx.appcompat.app.AppCompatActivity;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,27 +19,19 @@ import com.edutalk.app.sensor.BaseSensorType;
 import com.edutalk.app.sensor.streamsensor.StreamSensorType;
 import com.edutalk.app.sensor.triggersensor.TriggerSensorType;
 import com.edutalk.app.utils.DialogQueue;
+import com.edutalk.app.utils.LinkedMapForIntent;
 import com.edutalk.app.utils.PermissionManager;
 import com.edutalk.app.utils.Utils;
 import com.edutalk.app.utils.VersionManager;
-import com.google.android.play.core.appupdate.AppUpdateInfo;
-import com.google.android.play.core.appupdate.AppUpdateManager;
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.model.AppUpdateType;
-import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.android.play.core.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class EduTalkBridgeAppLink extends AppCompatActivity {
     EduTalkRCConfig eduTalkRCConfig;
-    HashMap<String, BaseSensorType> supportedDFSenosrs = new HashMap<>();
+    LinkedHashMap<String, BaseSensorType> supportedDFSenosrs = new LinkedHashMap<>();
     final Integer[] SAMPLE_RATES = new Integer[]{1, 10, 25, 50, 100, 200, 300, 400};
 
     TextView applinkTextView;
@@ -115,7 +103,7 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
                 Intent saActivity=new Intent().setClass(EduTalkBridgeAppLink.this, EduTalkSmartphoneSA.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("eduTalkRCConfig", eduTalkRCConfig);
-                bundle.putSerializable("selectedSensors", supportedDFSenosrs);
+                bundle.putSerializable("selectedSensors", new LinkedMapForIntent(supportedDFSenosrs));
                 bundle.putInt("sampleRate", (Integer) sampleRateSpinner.getSelectedItem());
                 saActivity.putExtras(bundle);
                 startActivity(saActivity);
@@ -124,8 +112,8 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
         });
     }
 
-    private HashMap<String, BaseSensorType> DFtoSensors(JSONArray idfs) throws JSONException {
-        HashMap<String, BaseSensorType> df2sensors=new HashMap<>();
+    private LinkedHashMap<String, BaseSensorType> DFtoSensors(JSONArray idfs) throws JSONException {
+        LinkedHashMap<String, BaseSensorType> df2sensors=new LinkedHashMap<>();
 
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         outer:

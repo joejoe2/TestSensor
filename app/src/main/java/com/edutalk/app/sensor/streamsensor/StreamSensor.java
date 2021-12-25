@@ -93,7 +93,7 @@ public class StreamSensor extends BaseSensor {
         if (sampleTime.size() - sendTime.size() > 0) {
             sampleTime.subList(0, sampleTime.size() - sendTime.size()).clear();
         }
-        Utils.saveTimeStampData(sampleTime, sendTime, System.currentTimeMillis()+"_"+getId());
+        //Utils.saveTimeStampData(sampleTime, sendTime, System.currentTimeMillis()+"_"+getId());
     }
 
     @Override
