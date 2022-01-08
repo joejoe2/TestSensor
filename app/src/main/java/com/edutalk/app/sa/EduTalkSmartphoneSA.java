@@ -104,25 +104,22 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         ArrayList<BaseSensor> sensors = new ArrayList<>();
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
-        JSONArray joins = new JSONArray(eduTalkRCConfig.joins);
+        JSONArray iv_list = eduTalkRCConfig.getIv_list();
+        int k=0;
         for(Map.Entry<String, BaseSensorType> selectedSensorType: selectedSensorTypes.entrySet()){
-            //get idfName, odfName, join, sensorType
+            //get idfName, iv, sensorType
             String idfName = selectedSensorType.getKey();
+            JSONObject iv = iv_list.getJSONObject(k++);
+            String displayName = iv.getString("giv_name")+(iv.get("index") instanceof String?"":iv.getInt("index"));
+            JSONObject param = iv.getJSONArray("params").getJSONObject(0);
             BaseSensorType sensorType = selectedSensorType.getValue();
-            JSONObject join = null;
-            for (int i=0;i<joins.length();i++){
-                if (idfName.equals(joins.getJSONObject(i).getString("idf")))
-                    join = joins.getJSONObject(i);
-            }
-            if (join==null)continue;
-            String odfName = join.getString("odf");
 
             //create sensor
             BaseSensor sensor = null;
             if (sensorType instanceof StreamSensorType){
                 StreamSensorType streamSensorType = (StreamSensorType) sensorType;
                 //build ui
-                MutliDimesionDataText dataText = CustomUIFactory.buildMutlDimesionDataText(this, idfName+
+                MutliDimesionDataText dataText = CustomUIFactory.buildMutlDimesionDataText(this, displayName+
                         " ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
                 sensorDataLayout.addView(dataText);
 
@@ -137,14 +134,14 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                 TriggerSensorType triggerSensorType = (TriggerSensorType) sensorType;
                 if (triggerSensorType == TriggerSensorType.RangeSlider){
                     //build ui
-                    SeekBarWithLabel seekBarWithLabel = CustomUIFactory.buildSeekBarWithLabel(this, odfName);
+                    SeekBarWithLabel seekBarWithLabel = CustomUIFactory.buildSeekBarWithLabel(this, displayName);
                     sensorDataLayout.addView(seekBarWithLabel);
 
                     //create sensor and update ui method
                     float step=0.01f; // configurable ?
                     int stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
                     sensor = new RangeSensor(idfName, seekBarWithLabel, triggerSensorType,
-                            join.getInt("min"), join.getInt("max"), step, join.getInt("default"));
+                            param.getInt("min"), param.getInt("max"), step, param.getInt("default"));
                     sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(()-> seekBarWithLabel.setValue(String.format("%."+stepPrecision+"f", data[0]))));
                 }else{
                     //add new TriggerSensor here ...

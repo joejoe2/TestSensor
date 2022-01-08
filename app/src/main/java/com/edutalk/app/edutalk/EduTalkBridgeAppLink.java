@@ -26,6 +26,8 @@ import com.edutalk.app.utils.VersionManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -63,8 +65,8 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
                 String rc_index_url = Uri.decode(appLink.getQueryParameter("data"));
                 //get to rc_index_url to retrieve eduTalkRCConfig
                 //eduTalkRCConfig = EduTalkService.fetchRCConfig(rc_index_url);
-                eduTalkRCConfig = EduTalkService.fetchRCConfigNew(rc_index_url+"&app=true");
-                supportedDFSenosrs = DFtoSensors(new JSONArray(eduTalkRCConfig.idf_list));
+                eduTalkRCConfig = EduTalkService.fetchRCConfig(rc_index_url+"&app=true");
+                supportedDFSenosrs = DFtoSensors(eduTalkRCConfig);
             }catch (Exception e){
                 e.printStackTrace();
                 runOnUiThread(EduTalkBridgeAppLink.this::terminateWithError);
@@ -112,31 +114,38 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
         });
     }
 
-    private LinkedHashMap<String, BaseSensorType> DFtoSensors(JSONArray idfs) throws JSONException {
+    private LinkedHashMap<String, BaseSensorType> DFtoSensors(EduTalkRCConfig eduTalkRCConfig) throws JSONException {
+        JSONArray idf_list = eduTalkRCConfig.getIdf_list();// idf list is corrupted !
+        JSONArray iv_list = eduTalkRCConfig.getIv_list();
+        JSONArray joins = eduTalkRCConfig.getJoins();
+
         LinkedHashMap<String, BaseSensorType> df2sensors=new LinkedHashMap<>();
 
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         outer:
-        for (int i =0; i<idfs.length(); i++){
-            /****************************************
-             * there is a mismatch dfName in edutalk (idf_list vs joins) !!!
-             * so replace _ with - temporarily
-             * ***************************************
-             * */
-            String dfName=idfs.getJSONArray(i).getString(0).replace("_", "-");
-            //check df is in StreamSensorType
-            for (StreamSensorType streamSensorType: StreamSensorType.values()) {
-                if (dfName.contains(streamSensorType.getDFAlias())&&Utils.isSensorAvailable(sensorManager, streamSensorType.getNativeSensorCode())){
-                    streamSensorType.setNeedTimestamp(true);
-                    df2sensors.put(dfName, streamSensorType);
-                    continue outer;
+        for (int i =0, j=0; i<joins.length();j++){
+            JSONObject iv = iv_list.getJSONObject(j);
+            JSONArray params = iv.getJSONArray("params");
+            JSONObject param = params.getJSONObject(0);
+            String dfName=joins.getJSONObject(i).getString("idf");
+            String select = param.getString("select");
+            i+=params.length();
+            if ("Smartphone Sensor".equals(select)){
+                //check df is in StreamSensorType
+                for (StreamSensorType streamSensorType: StreamSensorType.values()) {
+                    if (streamSensorType.getDFAlias().equals(param.getString("sensor"))&&Utils.isSensorAvailable(sensorManager, streamSensorType.getNativeSensorCode())){
+                        streamSensorType.setNeedTimestamp(true);
+                        df2sensors.put(dfName, streamSensorType);
+                        continue outer;
+                    }
                 }
-            }
-            //check df is in RangeSensorType
-            for (TriggerSensorType triggerSensorType: TriggerSensorType.values()) {
-                if (dfName.contains(triggerSensorType.getDFAlias())){
-                    df2sensors.put(dfName, triggerSensorType);
-                    continue outer;
+            }else{
+                //check df is in TriggerSensorType
+                for (TriggerSensorType triggerSensorType: TriggerSensorType.values()) {
+                    if (triggerSensorType.getDFAlias().equals(select)){
+                        df2sensors.put(dfName, triggerSensorType);
+                        continue outer;
+                    }
                 }
             }
         }

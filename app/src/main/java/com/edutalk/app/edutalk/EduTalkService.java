@@ -49,15 +49,6 @@ public class EduTalkService {
         //ex. http://phyedu.iottalk.tw/lecture/6/rc/?token=99d42d77825346e4ad24a7653c06ffdb
         Request request = new Request.Builder().url(url).build();
         Response response = httpClient.newCall(request).execute();
-        EduTalkRCConfig eduTalkRCConfig = new EduTalkRCConfig(response.body().string());
-        response.close();
-        return eduTalkRCConfig;
-    }
-
-    public static EduTalkRCConfig fetchRCConfigNew(String url) throws IOException, JSONException {
-        //ex. http://phyedu.iottalk.tw/lecture/6/rc/?token=99d42d77825346e4ad24a7653c06ffdb
-        Request request = new Request.Builder().url(url).build();
-        Response response = httpClient.newCall(request).execute();
         EduTalkRCConfig eduTalkRCConfig = new EduTalkRCConfig(new JSONObject(response.body().string()));
         response.close();
         return eduTalkRCConfig;

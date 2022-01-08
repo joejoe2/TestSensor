@@ -1,5 +1,6 @@
 package com.edutalk.app.sensor.triggersensor;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 
@@ -40,8 +41,8 @@ public class RangeSensor extends BaseSensor {
     public void startSensing() {
         if (uiComponent.getClass().getCanonicalName().equals(TriggerSensorType.RangeSlider.getCorrespondingUI())){
             SeekBarWithLabel seekBar = ((SeekBarWithLabel) uiComponent);
-            seekBar.setSeekBarRange((int) (1.0/step*(max-min)), (int) (defaultVal/step+min));
-            seekBar.setValue(String.format("%."+stepPrecision+"f", defaultVal+min));
+            seekBar.setSeekBarRange((int) (1.0/step*(max-min)), (int) ((defaultVal-min)/step));
+            seekBar.setValue(String.format("%."+stepPrecision+"f", defaultVal));
             seekBar.setSeekBarListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) { }
@@ -51,6 +52,7 @@ public class RangeSensor extends BaseSensor {
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     if (!isSensing)return;
                     float[] data = new float[]{seekBar.getProgress()*step+min};
+                    Log.i("test", "onStopTrackingTouch: "+data[0]);
                     onSignalCallback.doOnSignal(data);
                     dataQueue.add(data);
                 }

@@ -17,7 +17,12 @@ public enum TriggerSensorType implements BaseSensorType, DFInfo {
 
     @Override
     public String getDFAlias() {
-        return name();
+        switch (this){
+            case RangeSlider:
+                return "Range Slider";
+            default:
+                return this.name();
+        }
     }
 
     private boolean needTimeStamp = false;
