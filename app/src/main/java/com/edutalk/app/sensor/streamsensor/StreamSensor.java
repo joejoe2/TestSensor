@@ -43,11 +43,12 @@ public class StreamSensor extends BaseSensor {
         this.sampleRate = sampleRate>=100?sampleRate+10:sampleRate; // avoid sensor lazy(a little bit smaller than 200) on 5z
         this.consumeIntervalNS = getConsumeIntervalNS(this.sampleRate);
         this.sensor = this.sensorManager.getDefaultSensor(this.streamSensorType.getNativeSensorCode());
+        this.dataQueue = new ConcurrentLinkedQueue<>();
     }
 
     @Override
     public void start(){
-        this.dataQueue = new ConcurrentLinkedQueue<>();
+        dataQueue.clear();
         startSensing();
         startConsuming();
     }

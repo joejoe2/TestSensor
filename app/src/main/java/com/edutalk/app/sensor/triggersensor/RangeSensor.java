@@ -2,9 +2,8 @@ package com.edutalk.app.sensor.triggersensor;
 
 import android.util.Log;
 import android.view.View;
-import android.widget.SeekBar;
 
-import com.edutalk.app.customUI.SeekBarWithLabel;
+import com.edutalk.app.customUI.SeekBar;
 import com.edutalk.app.sensor.BaseSensor;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,11 +27,12 @@ public class RangeSensor extends BaseSensor {
         this.step = step;
         this.defaultVal = defaultVal;
         this.stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
+        dataQueue = new ConcurrentLinkedQueue<>();
     }
 
     @Override
     public void start() {
-        dataQueue = new ConcurrentLinkedQueue<>();
+        dataQueue.clear();
         startSensing();
         startConsuming();
     }
@@ -40,16 +40,16 @@ public class RangeSensor extends BaseSensor {
     @Override
     public void startSensing() {
         if (uiComponent.getClass().getCanonicalName().equals(TriggerSensorType.RangeSlider.getCorrespondingUI())){
-            SeekBarWithLabel seekBar = ((SeekBarWithLabel) uiComponent);
+            SeekBar seekBar = ((SeekBar) uiComponent);
             seekBar.setSeekBarRange((int) (1.0/step*(max-min)), (int) ((defaultVal-min)/step));
             seekBar.setValue(String.format("%."+stepPrecision+"f", defaultVal));
-            seekBar.setSeekBarListener(new SeekBar.OnSeekBarChangeListener() {
+            seekBar.setSeekBarListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) { }
+                public void onProgressChanged(android.widget.SeekBar seekBar, int i, boolean b) { }
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) { }
+                public void onStartTrackingTouch(android.widget.SeekBar seekBar) { }
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
                     if (!isSensing)return;
                     float[] data = new float[]{seekBar.getProgress()*step+min};
                     Log.i("test", "onStopTrackingTouch: "+data[0]);
@@ -58,6 +58,7 @@ public class RangeSensor extends BaseSensor {
                 }
             });
         }
+        dataQueue.add(new float[]{defaultVal});
         isSensing=true;
     }
 
@@ -95,6 +96,6 @@ public class RangeSensor extends BaseSensor {
     protected void stopConsuming() {
         dataConsumerExit = true;
         dataConsumer = null;
-        dataQueue = null;
+        dataQueue.clear();
     }
 }

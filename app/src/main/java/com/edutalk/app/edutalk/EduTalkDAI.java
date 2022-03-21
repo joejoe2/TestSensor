@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import iottalk.AppID;
 import iottalk.DAN;
@@ -26,9 +28,9 @@ public class EduTalkDAI {
     private String userName = null;
     private DAN dan;
 
-    private BaseSensor[] sensors;
+    private HashMap<String, BaseSensor> sensors;
 
-    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, String deviceName, String deviceModel, BaseSensor[] sensors) {
+    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, String deviceName, String deviceModel, HashMap<String, BaseSensor> sensors) {
         this.csmEndpoint = csmEndpoint;
         this.deviceName = deviceName;
         this.deviceModel = deviceModel;
@@ -41,8 +43,8 @@ public class EduTalkDAI {
         //dai profile
         setupDAN();
 
-        //set consumer of StreamingSensor
-        for (BaseSensor sensor : sensors) {
+        //set consumer of sensor
+        for (BaseSensor sensor : sensors.values()) {
             sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
                 long sendAt=0;
                 try {
@@ -57,25 +59,29 @@ public class EduTalkDAI {
             });
         }
 
-        //start sensor and dai to work
-        new Thread(()->{
+        Thread thread=new Thread(()->{
             try {
                 System.out.println("DAI started");
-                dan.register(); //register and connect
+                //register and connect
+                dan.register();
                 EduTalkService.bindRC(BIND_RC_URL, deviceAddr.getUUID().toString());
-                for (BaseSensor sensor : sensors) {
+                //start sensor
+                /*for (BaseSensor sensor : sensors) {
                     sensor.start();
-                }
+                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }).start();
+        });
+        thread.start();
+        //thread.join();
+        //if (ex.get()!=null)throw new Exception();
     }
 
     private void setupDAN() throws Exception {
         //set idf
         ArrayList<DeviceFeature> inputDeviceFeatures = new ArrayList<>();
-        for (BaseSensor sensor: sensors) {
+        for (BaseSensor sensor: sensors.values()) {
             inputDeviceFeatures.add(new DeviceFeature(sensor.getId(), "idf"));
         }
         //set df
@@ -90,17 +96,18 @@ public class EduTalkDAI {
             public boolean onSignal(String command, String df) {
                 //when device feature connect or disconnect on joins (first connect or last disconnect only)!
                 System.out.println(df + ":" + command);
+                sensors.get(df).start();
                 return true;
             }
         };
         //avoid mqtt too many in progress problem
-        dan.setMaxInflight(sensors.length*200);
+        dan.setMaxInflight(sensors.size()*200);
     }
 
     public void stop() {
         Thread t=new Thread(()->{
             try {
-                for (BaseSensor sensor : sensors) {
+                for (BaseSensor sensor : sensors.values()) {
                     sensor.stop();
                 }
                 EduTalkService.unBindRC(BIND_RC_URL.replace("bind", "unbind")); //useless ?

@@ -72,11 +72,6 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
         return res;
     }
 
-    @Override
-    public String getDFAlias() {
-        return name();
-    }
-
     private boolean needTimeStamp = false;
     @Override
     public boolean isNeedTimeStamp() {
@@ -86,5 +81,10 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
     @Override
     public void setNeedTimestamp(boolean needTimeStamp) {
         this.needTimeStamp = needTimeStamp;
+    }
+
+    @Override
+    public String getAlias() {
+        return name();
     }
 }

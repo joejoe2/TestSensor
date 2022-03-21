@@ -2,7 +2,9 @@ package com.edutalk.app.edutalk;
 
 import android.util.Log;
 
+import org.eclipse.paho.client.mqttv3.logging.LoggerFactory;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,14 +12,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.internal.connection.ConnectInterceptor;
+import okhttp3.internal.http.CallServerInterceptor;
 
 public class EduTalkService {
     private static OkHttpClient httpClient;
@@ -54,23 +61,32 @@ public class EduTalkService {
         return eduTalkRCConfig;
     }
 
-    public static boolean bindRC(String url, String deviceID){
-        Request request = new Request.Builder().url(url+deviceID).post(RequestBody.create(null, new byte[0])).build();
-        System.out.println(url);
-        try {
-            Response response = httpClient.newCall(request).execute();
-            String res = response.body().string();
-            response.close();
-            System.out.println("rc_bind: "+res);
-            return res.equals("{\"state\":\"ok\"}");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public static void bindRC(String url, String deviceID) throws IOException{
+        HashMap<String, String> headers=new HashMap<>();
+        headers.put("x-csrf-token", getCsrfToken(url));
+        headers.put("referer", url+deviceID);
+        Request request = new Request.Builder().url(url+deviceID).headers(Headers.of()).headers(Headers.of(headers)).post(RequestBody.create(null, new byte[0])).build();
+        System.out.println(request.headers());
+        Response response = httpClient.newCall(request).execute();
+        String res = response.body().string();
+        response.close();
+        System.out.println("rc_bind: "+res);
     }
 
-    public static boolean unBindRC(String url){
-        Request request = new Request.Builder().url(url).post(RequestBody.create(null, new byte[0])).build();
+    private static String getCsrfToken(String url)throws IOException{
+        HttpUrl URL = HttpUrl.parse(url);
+        Request request = new Request.Builder().url(URL.scheme()+"://"+HttpUrl.parse(url).host()+"/csrf_refresh").get().build();
+        Response response = httpClient.newCall(request).execute();
+        String token = response.body().string();
+        token=token.substring(token.indexOf("\"")+1, token.lastIndexOf("\""));
+        return token;
+    }
+
+    public static boolean unBindRC(String url) throws IOException {
+        HashMap<String, String> headers=new HashMap<>();
+        headers.put("x-csrf-token", getCsrfToken(url));
+        headers.put("referer", url);
+        Request request = new Request.Builder().url(url).headers(Headers.of(headers)).post(RequestBody.create(null, new byte[0])).build();
         try {
             Response response = httpClient.newCall(request).execute();
             String res = response.body().string();

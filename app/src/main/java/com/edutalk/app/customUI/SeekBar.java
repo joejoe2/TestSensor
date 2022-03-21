@@ -3,27 +3,27 @@ package com.edutalk.app.customUI;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.edutalk.app.R;
 
 import androidx.core.content.res.ResourcesCompat;
 
-public class SeekBarWithLabel extends com.edutalk.app.customUI.SeekBar {
-    private TextView titleText;
+public class SeekBar extends LinearLayout{
     private TextView valueText;
-    private SeekBar seekBar;
+    private android.widget.SeekBar seekBar;
     private int lengthOfSeekBar=100, defaultProgress=50;
-    private String title;
     private float bigFontSize, smallFontSize;
     private int color;
 
-    public SeekBarWithLabel(Context context, String title, float smallFontSize, float bigFontSize, int color) {
+    public SeekBar(Context context){
+        super(context);
+    }
+
+    public SeekBar(Context context, float smallFontSize, float bigFontSize, int color) {
         super(context);
         this.setOrientation(LinearLayout.VERTICAL);
 
-        this.title = title;
         this.bigFontSize = bigFontSize;
         this.smallFontSize = smallFontSize;
         this.color = color;
@@ -33,18 +33,12 @@ public class SeekBarWithLabel extends com.edutalk.app.customUI.SeekBar {
     }
 
     private void buildComponents(){
-        titleText = new TextView(getContext());
-        titleText.setText(title);
-        titleText.setTextSize(bigFontSize);
-        titleText.setTextColor(color);
-        titleText.setTypeface(titleText.getTypeface(), Typeface.BOLD_ITALIC);
-
         valueText = new TextView(getContext());
         valueText.setTextSize(smallFontSize);
         valueText.setTextColor(color);
         valueText.setTypeface(valueText.getTypeface(), Typeface.BOLD_ITALIC);
 
-        seekBar = new SeekBar(getContext());
+        seekBar = new android.widget.SeekBar(getContext());
         seekBar.setProgressDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_progress, null));
         seekBar.setThumb(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_thumb, null));
         seekBar.setPadding(0, 15, 0, 10);
@@ -54,16 +48,11 @@ public class SeekBarWithLabel extends com.edutalk.app.customUI.SeekBar {
     }
 
     private void combineComponents(){
-        LayoutParams normalParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams normalParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         normalParams.setMargins(5, 2, 5, 2);
-        LayoutParams topMarginParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        topMarginParams.setMargins(5, 5, 5, 2);
-
-        titleText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        this.addView(titleText, normalParams);
 
         valueText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        this.addView(valueText, topMarginParams);
+        this.addView(valueText, normalParams);
 
         this.addView(seekBar, normalParams);
     }
@@ -81,7 +70,7 @@ public class SeekBarWithLabel extends com.edutalk.app.customUI.SeekBar {
         valueText.setText(value);
     }
 
-    public void setSeekBarListener(SeekBar.OnSeekBarChangeListener onSeekBarChangeListener){
+    public void setSeekBarListener(android.widget.SeekBar.OnSeekBarChangeListener onSeekBarChangeListener){
         seekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
     }
 }

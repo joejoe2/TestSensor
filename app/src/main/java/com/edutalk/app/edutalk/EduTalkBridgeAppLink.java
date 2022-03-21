@@ -33,10 +33,8 @@ import java.util.LinkedHashMap;
 
 public class EduTalkBridgeAppLink extends AppCompatActivity {
     EduTalkRCConfig eduTalkRCConfig;
-    LinkedHashMap<String, BaseSensorType> supportedDFSenosrs = new LinkedHashMap<>();
     final Integer[] SAMPLE_RATES = new Integer[]{1, 10, 25, 50, 100, 200, 300, 400};
 
-    TextView applinkTextView;
     Button startSAButton;
     Spinner sampleRateSpinner;
 
@@ -66,7 +64,6 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
                 //get to rc_index_url to retrieve eduTalkRCConfig
                 //eduTalkRCConfig = EduTalkService.fetchRCConfig(rc_index_url);
                 eduTalkRCConfig = EduTalkService.fetchRCConfig(rc_index_url+"&app=true");
-                supportedDFSenosrs = DFtoSensors(eduTalkRCConfig);
             }catch (Exception e){
                 e.printStackTrace();
                 runOnUiThread(EduTalkBridgeAppLink.this::terminateWithError);
@@ -80,10 +77,6 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
     }
 
     private void setUI(){
-        applinkTextView = findViewById(R.id.applinkTextView);
-
-        applinkTextView.setText("supported idfs are ready:\n\n"+ supportedDFSenosrs.keySet());
-
         sampleRateSpinner = findViewById(R.id.sampleRateSpinner);
         sampleRateSpinner.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, SAMPLE_RATES));
@@ -105,51 +98,11 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
                 Intent saActivity=new Intent().setClass(EduTalkBridgeAppLink.this, EduTalkSmartphoneSA.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("eduTalkRCConfig", eduTalkRCConfig);
-                bundle.putSerializable("selectedSensors", new LinkedMapForIntent(supportedDFSenosrs));
-                bundle.putInt("sampleRate", (Integer) sampleRateSpinner.getSelectedItem());
                 saActivity.putExtras(bundle);
                 startActivity(saActivity);
                 finish();
             }
         });
-    }
-
-    private LinkedHashMap<String, BaseSensorType> DFtoSensors(EduTalkRCConfig eduTalkRCConfig) throws JSONException {
-        JSONArray idf_list = eduTalkRCConfig.getIdf_list();// idf list is corrupted !
-        JSONArray iv_list = eduTalkRCConfig.getIv_list();
-        JSONArray joins = eduTalkRCConfig.getJoins();
-
-        LinkedHashMap<String, BaseSensorType> df2sensors=new LinkedHashMap<>();
-
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        outer:
-        for (int i =0, j=0; i<joins.length();j++){
-            JSONObject iv = iv_list.getJSONObject(j);
-            JSONArray params = iv.getJSONArray("params");
-            JSONObject param = params.getJSONObject(0);
-            String dfName=joins.getJSONObject(i).getString("idf");
-            String select = param.getString("select");
-            i+=params.length();
-            if ("Smartphone Sensor".equals(select)){
-                //check df is in StreamSensorType
-                for (StreamSensorType streamSensorType: StreamSensorType.values()) {
-                    if (streamSensorType.getDFAlias().equals(param.getString("sensor"))&&Utils.isSensorAvailable(sensorManager, streamSensorType.getNativeSensorCode())){
-                        streamSensorType.setNeedTimestamp(true);
-                        df2sensors.put(dfName, streamSensorType);
-                        continue outer;
-                    }
-                }
-            }else{
-                //check df is in TriggerSensorType
-                for (TriggerSensorType triggerSensorType: TriggerSensorType.values()) {
-                    if (triggerSensorType.getDFAlias().equals(select)){
-                        df2sensors.put(dfName, triggerSensorType);
-                        continue outer;
-                    }
-                }
-            }
-        }
-        return df2sensors;
     }
 
     private void checkUpdate(){

@@ -1,29 +1,20 @@
 package com.edutalk.app.sensor.triggersensor;
 
+import com.edutalk.app.customUI.SeekBar;
 import com.edutalk.app.customUI.SeekBarWithLabel;
 import com.edutalk.app.sensor.BaseSensorType;
 import com.edutalk.app.sensor.DFInfo;
 
 
 public enum TriggerSensorType implements BaseSensorType, DFInfo {
-    RangeSlider(SeekBarWithLabel.class.getCanonicalName()),
+    RangeSlider(SeekBar.class.getCanonicalName()),
     ;
 
     private final String uiClassName;
     TriggerSensorType(String viewClass) {
-        this.uiClassName =viewClass;
+        this.uiClassName = viewClass;
     }
     public String getCorrespondingUI() { return uiClassName; }
-
-    @Override
-    public String getDFAlias() {
-        switch (this){
-            case RangeSlider:
-                return "Range Slider";
-            default:
-                return this.name();
-        }
-    }
 
     private boolean needTimeStamp = false;
     @Override
@@ -34,5 +25,15 @@ public enum TriggerSensorType implements BaseSensorType, DFInfo {
     @Override
     public void setNeedTimestamp(boolean needTimeStamp) {
         this.needTimeStamp = needTimeStamp;
+    }
+
+    @Override
+    public String getAlias() {
+        switch (this){
+            case RangeSlider:
+                return "Range Slider";
+            default:
+                return this.name();
+        }
     }
 }

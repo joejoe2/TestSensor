@@ -98,11 +98,11 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
         for (StreamSensorType streamSensorType: selectedSensors) {
             //build ui
             MutliDimesionDataText dataText= CustomUIFactory.buildMutlDimesionDataText(this,
-                    streamSensorType.getDFAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
+                    streamSensorType.getAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
             sensorDataLayout.addView(dataText);
 
             //create sensor and update method
-            StreamSensor sensor = new StreamSensor(streamSensorType.getDFAlias()+"-I", sensorManager, streamSensorType, sampleRate);
+            StreamSensor sensor = new StreamSensor(streamSensorType.getAlias()+"-I", sensorManager, streamSensorType, sampleRate);
             sensor.setOnSensorSignalCallBack((float[] data)->{
                 runOnUiThread(()->{
                     dataText.setValues(IntStream.range(0, data.length).mapToObj(i -> String.format("%.2f", data[i])).toArray(String[]::new));
