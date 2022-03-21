@@ -92,9 +92,11 @@ public class StreamSensor extends BaseSensor {
         stopSensing();
         stopConsuming();
         if (sampleTime.size() - sendTime.size() > 0) {
-            sampleTime.subList(0, sampleTime.size() - sendTime.size()).clear();
+            sampleTime = (ArrayList<Long>) sampleTime.subList(0, sampleTime.size() - sendTime.size());
+            sampleTime.clear();
         }
         //Utils.saveTimeStampData(sampleTime, sendTime, System.currentTimeMillis()+"_"+getId());
+        //System.out.println(sampleTime.size()/((sampleTime.get(sampleTime.size()-1)-sampleTime.get(0))/1000));
     }
 
     @Override

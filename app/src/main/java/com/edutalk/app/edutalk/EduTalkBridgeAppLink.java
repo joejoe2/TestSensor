@@ -98,6 +98,7 @@ public class EduTalkBridgeAppLink extends AppCompatActivity {
                 Intent saActivity=new Intent().setClass(EduTalkBridgeAppLink.this, EduTalkSmartphoneSA.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("eduTalkRCConfig", eduTalkRCConfig);
+                bundle.putInt("sampleRate", (Integer) sampleRateSpinner.getSelectedItem());
                 saActivity.putExtras(bundle);
                 startActivity(saActivity);
                 finish();
