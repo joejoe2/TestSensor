@@ -73,9 +73,21 @@ public class EduTalkService {
         System.out.println("rc_bind: "+res);
     }
 
+    public static void bindM2(String url) throws IOException{
+        HashMap<String, String> headers=new HashMap<>();
+        headers.put("x-csrf-token", getCsrfToken(url));
+        headers.put("referer", url);
+        Request request = new Request.Builder().url(url).headers(Headers.of()).headers(Headers.of(headers)).post(RequestBody.create(null, new byte[0])).build();
+        System.out.println(request.headers());
+        Response response = httpClient.newCall(request).execute();
+        String res = response.body().string();
+        response.close();
+        System.out.println("m2_bind: "+res);
+    }
+
     private static String getCsrfToken(String url)throws IOException{
         HttpUrl URL = HttpUrl.parse(url);
-        Request request = new Request.Builder().url(URL.scheme()+"://"+HttpUrl.parse(url).host()+"/csrf_refresh").get().build();
+        Request request = new Request.Builder().url(URL.scheme()+"://"+HttpUrl.parse(url).host()+"/edutalk/csrf_refresh").get().build();
         Response response = httpClient.newCall(request).execute();
         String token = response.body().string();
         token=token.substring(token.indexOf("\"")+1, token.lastIndexOf("\""));

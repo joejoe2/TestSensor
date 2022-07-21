@@ -7,7 +7,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class VersionManager {
-    private static final double currentVersion = 0.5;
+    private static final double currentVersion = 0.6;
     private static boolean hasNewVersion;
     private static final String host="https://iottalk.github.io/applink/edutalk/apk";
     private static String downloadUrl=host+"/index.html";

@@ -26,11 +26,11 @@ public class Label extends LinearLayout {
 
     private void combineComponents() {
         LayoutParams normalParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        normalParams.setMargins(5, 2, 5, 2);
+        normalParams.setMargins(10, 2, 5, 2);
         LayoutParams topMarginParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         topMarginParams.setMargins(5, 5, 5, 2);
 
-        titleText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        titleText.setTextAlignment(TEXT_ALIGNMENT_VIEW_START);
         this.addView(titleText, normalParams);
     }
 

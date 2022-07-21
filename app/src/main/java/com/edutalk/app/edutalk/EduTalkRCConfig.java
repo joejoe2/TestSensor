@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class EduTalkRCConfig implements Serializable {
     public int lectureID;
-    public String device_name, device_model, csm_url, rc_bind;
+    public String device_name, device_model, csm_url, rc_bind, m2_bind;
     private String idfs;
     private String iv_list;
 
@@ -43,6 +43,7 @@ public class EduTalkRCConfig implements Serializable {
 
         csm_url = jsonResponse.getString("csm_url");
         rc_bind = jsonResponse.getString("rc_bind");
+        m2_bind = jsonResponse.optString("m2_bind", null);
         //if (csm_url.startsWith("https")&rc_bind.startsWith("http"))rc_bind = rc_bind.replace("http", "https");
     }
 

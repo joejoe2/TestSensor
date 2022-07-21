@@ -83,6 +83,18 @@ public enum StreamSensorType implements BaseSensorType, DFInfo {
         this.needTimeStamp = needTimeStamp;
     }
 
+    private boolean needDfName = false;
+
+    @Override
+    public boolean isNeedDfName() {
+        return needDfName;
+    }
+
+    @Override
+    public void setNeedDfName(boolean needDfName) {
+        this.needDfName = needDfName;
+    }
+
     @Override
     public String getAlias() {
         return name();

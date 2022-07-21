@@ -42,12 +42,17 @@ public class IoTTalkDAI {
         //set consumer of StreamingSensor
         for (StreamSensor sensor : sensors) {
             sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
-                long sendAt=0;
+                long sendAt=System.currentTimeMillis();
                 try {
                     JSONArray data = new JSONArray(sensorData);
-                    sendAt = System.currentTimeMillis();
-                    if (((DFInfo)sensor.getBaseSensorType()).isNeedTimeStamp())data.put(sensorData.length, sendAt);
-                    dan.push(sensor.getId(), data);  //push data
+                    DFInfo dfInfo = (DFInfo)sensor.getBaseSensorType();
+
+                    if (dfInfo.isNeedTimeStamp())
+                        data.put(sensorData.length, sendAt);
+                    if (dfInfo.isNeedDfName())
+                        data.put(sensorData.length, sensor.getId().replace("-", "_"));
+
+                    dan.push(sensor.getId(), data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

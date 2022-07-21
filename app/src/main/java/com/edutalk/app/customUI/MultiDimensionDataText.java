@@ -6,7 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class MutliDimesionDataText extends LinearLayout {
+public class MultiDimensionDataText extends LinearLayout {
     private TextView titleText;
     private TextView[] dimensionText;
     private TextView[] valueText;
@@ -16,7 +16,7 @@ public class MutliDimesionDataText extends LinearLayout {
     private float bigFontSize, smallFontSize;
     private int color;
 
-    public MutliDimesionDataText(Context context, String title, String[] dimensionNames, float smallFontSize, float bigFontSize, int color) {
+    public MultiDimensionDataText(Context context, String title, String[] dimensionNames, float smallFontSize, float bigFontSize, int color) {
         super(context);
         this.setOrientation(LinearLayout.VERTICAL);
 
@@ -58,26 +58,23 @@ public class MutliDimesionDataText extends LinearLayout {
 
     private void combineComponents(){
         LayoutParams matchParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        matchParams.setMargins(5, 5, 5, 5);
+        matchParams.setMargins(10, 5, 5, 5);
         LayoutParams splitParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         splitParams.weight = 1.0f;
         splitParams.setMargins(10, 5, 10, 5);
 
-        titleText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        titleText.setTextAlignment(TEXT_ALIGNMENT_VIEW_START);
         this.addView(titleText, matchParams);
 
+        LinearLayout horizontalLayout = new LinearLayout(getContext());
+        horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
         for (int i=0;i<dimension;i++){
-            LinearLayout horizontalLayout = new LinearLayout(getContext());
-            horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
-
             dimensionText[i].setTextAlignment(TEXT_ALIGNMENT_VIEW_END);
             horizontalLayout.addView(dimensionText[i], splitParams);
-
             valueText[i].setTextAlignment(TEXT_ALIGNMENT_VIEW_START);
             horizontalLayout.addView(valueText[i], splitParams);
-
-            this.addView(horizontalLayout, matchParams);
         }
+        this.addView(horizontalLayout, matchParams);
     }
 
     public void setValues(String[] values){

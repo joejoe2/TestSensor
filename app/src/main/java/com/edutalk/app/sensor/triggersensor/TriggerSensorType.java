@@ -1,7 +1,6 @@
 package com.edutalk.app.sensor.triggersensor;
 
 import com.edutalk.app.customUI.SeekBar;
-import com.edutalk.app.customUI.SeekBarWithLabel;
 import com.edutalk.app.sensor.BaseSensorType;
 import com.edutalk.app.sensor.DFInfo;
 
@@ -25,6 +24,18 @@ public enum TriggerSensorType implements BaseSensorType, DFInfo {
     @Override
     public void setNeedTimestamp(boolean needTimeStamp) {
         this.needTimeStamp = needTimeStamp;
+    }
+
+    private boolean needDfName = false;
+
+    @Override
+    public boolean isNeedDfName() {
+        return needDfName;
+    }
+
+    @Override
+    public void setNeedDfName(boolean needDfName) {
+        this.needDfName = needDfName;
     }
 
     @Override

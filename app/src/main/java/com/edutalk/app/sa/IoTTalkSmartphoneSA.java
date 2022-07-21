@@ -17,7 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.edutalk.app.customUI.CustomUIFactory;
-import com.edutalk.app.customUI.MutliDimesionDataText;
+import com.edutalk.app.customUI.MultiDimensionDataText;
 import com.edutalk.app.iottalk.IoTTalkDAI;
 import com.edutalk.app.MainActivity;
 import com.edutalk.app.R;
@@ -97,7 +97,7 @@ public class IoTTalkSmartphoneSA extends AppCompatActivity {
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         for (StreamSensorType streamSensorType: selectedSensors) {
             //build ui
-            MutliDimesionDataText dataText= CustomUIFactory.buildMutlDimesionDataText(this,
+            MultiDimensionDataText dataText= CustomUIFactory.buildMutlDimesionDataText(this,
                     streamSensorType.getAlias()+" ( "+streamSensorType.getAcceptUnit()+" )", streamSensorType.getDataDimensionNames());
             sensorDataLayout.addView(dataText);
 

@@ -52,9 +52,9 @@ public class SeekBar extends LinearLayout{
         normalParams.setMargins(5, 2, 5, 2);
 
         valueText.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        this.addView(valueText, normalParams);
 
         this.addView(seekBar, normalParams);
+        this.addView(valueText, normalParams);
     }
 
     public void setSeekBarRange(int lengthOfSeekBar, int defaultProgress){

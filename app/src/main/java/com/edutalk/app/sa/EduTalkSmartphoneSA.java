@@ -2,20 +2,19 @@ package com.edutalk.app.sa;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.edutalk.app.customUI.CustomUIFactory;
 import com.edutalk.app.customUI.DataText;
-import com.edutalk.app.customUI.MutliDimesionDataText;
+import com.edutalk.app.customUI.MultiDimensionDataText;
 import com.edutalk.app.customUI.SeekBar;
 import com.edutalk.app.edutalk.EduTalkDAI;
 import com.edutalk.app.R;
@@ -53,14 +52,14 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
     ConnectivityManager.NetworkCallback onNetworkStateChangeCallback;
 
     Button exitButton;
-    TextView deviceModelTexView, deviceNameTexView;
     ScrollView sensorDataView;
     LinearLayout dataLayout, sensorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.smartphone_sa);
+        setContentView(R.layout.edutalk_smartphone_sa);
+        CustomUIFactory.setFontColor(Color.BLACK);
         getBundle();
         setUI();
         setListeners();
@@ -84,10 +83,6 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
 
     private void setUI(){
         exitButton = findViewById(R.id.exitButton);
-        deviceModelTexView = findViewById(R.id.deviceModelTextView);
-        deviceModelTexView.setText(eduTalkRCConfig.device_model);
-        deviceNameTexView = findViewById(R.id.deviceNameTextView);
-        deviceNameTexView.setText(eduTalkRCConfig.device_name);
         sensorDataView = findViewById(R.id.scrollView);
         dataLayout = findViewById(R.id.dataLayout);
         sensorLayout = findViewById(R.id.sensorLayout);
@@ -99,7 +94,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.device_name, eduTalkRCConfig.device_model, selectedSensors);
+        dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.m2_bind, eduTalkRCConfig.device_name, eduTalkRCConfig.device_model, selectedSensors);
     }
 
     private HashMap<String, BaseSensor> getSensors(EduTalkRCConfig rcConfig) throws JSONException {
@@ -120,10 +115,10 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                 String idfName = getIdfName(idfs, iv_list, i, j);
                 BaseSensor sensor = null;
 
-                if (j==0){
-                    dataLayout.addView(CustomUIFactory.buildLabel(this, displayName));
-                }
+                //build label for odf
+                if (j==0)dataLayout.addView(CustomUIFactory.buildLabel(this, displayName));
 
+                //build sensor
                 if (param.getString("device").equals("Smartphone")){
                     StreamSensorType sensorType=null;
                     for (StreamSensorType streamSensorType:StreamSensorType.values()){
@@ -137,7 +132,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                     //build ui
                     String function = param.getString("function");
                     DataText dataText = CustomUIFactory.buildDataText(this);
-                    dataText.setValues("use "+sensorType.getAlias()+" sensor with function "+function);
+                    dataText.setValues("Using "+sensorType.getAlias()+" Sensor with function "+function);
                     List<DataText> texts = dataTexts.getOrDefault(idfName, new ArrayList<>());
                     texts.add(dataText);
                     dataTexts.put(idfName, texts);
@@ -148,7 +143,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                     if (!selectStreamSensor.contains(sensorType)){
                         selectStreamSensor.add(sensorType);
 
-                        MutliDimesionDataText mutliDimesionDataText = CustomUIFactory.buildMutlDimesionDataText(this,
+                        MultiDimensionDataText mutliDimesionDataText = CustomUIFactory.buildMutlDimesionDataText(this,
                                 sensorType.getAlias()+" ( "+sensorType.getAcceptUnit()+" )", sensorType.getDataDimensionNames());
                         sensorLayout.addView(mutliDimesionDataText);
                         sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(() ->{
@@ -163,21 +158,41 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                     SeekBar seekBar = CustomUIFactory.buildSeekBar(this);
                     seekBar.setValue(String.format("%."+stepPrecision+"f", (float)param.getInt("default")));
                     dataLayout.addView(seekBar);
+                    TriggerSensorType sensorType = TriggerSensorType.RangeSlider;
+                    sensorType.setNeedTimestamp(true);
+                    sensorType.setNeedDfName(true);
                     //build sensor
-                    sensor = new RangeSensor(idfName, seekBar, TriggerSensorType.RangeSlider,
+                    sensor = new RangeSensor(idfName, seekBar, sensorType,
                             param.getInt("min"), param.getInt("max"), step, param.getInt("default"));
                     sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(()-> seekBar.setValue(String.format("%."+stepPrecision+"f", data[0]))));
                 }else {
                     UnSupportSensorType sensorType;
                     if(UnSupportSensorType.InputBox.getAlias().equals(param.getString("device"))){
+                        //build sensor
                         sensorType=UnSupportSensorType.InputBox;
+                        sensorType.setNeedTimestamp(true);
+                        sensorType.setNeedDfName(true);
                         sensor = sensors.getOrDefault(idfName, new UnSupportSensor(idfName, sensorType));
                         ((UnSupportSensor)sensor).getDefaultVals().add((float) param.getInt("default"));
+                        //build ui
+                        DataText dataText = CustomUIFactory.buildDataText(this);
+                        dataText.setValues(sensorType.getAlias()+" is not supported now");
+                        dataLayout.addView(dataText);
                     }else if (UnSupportSensorType.Morsensor.getAlias().equals(param.getString("device"))){
+                        //build sensor
                         sensorType=UnSupportSensorType.Morsensor;
                         sensorType.setNeedTimestamp(true);
                         sensor = sensors.getOrDefault(idfName, new UnSupportSensor(idfName, sensorType));
                         ((UnSupportSensor)sensor).getDefaultVals().add((float) param.getInt("default"));
+                        //build ui
+                        DataText dataText = CustomUIFactory.buildDataText(this);
+                        dataText.setValues(sensorType.getAlias()+" is not supported now");
+                        dataLayout.addView(dataText);
+                    }else if("M2".equals(param.getString("device"))){
+                        //build ui
+                        DataText dataText = CustomUIFactory.buildDataText(this);
+                        dataText.setValues("Using M2 "+param.optString("sensor", "sensor")+" Sensor on EduTalk");
+                        dataLayout.addView(dataText);
                     }
                 }
 

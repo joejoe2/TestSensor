@@ -11,31 +11,36 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import iottalk.AppID;
 import iottalk.DAN;
 import iottalk.DeviceFeature;
 
 public class EduTalkDAI {
-    private boolean aliveFlag;
     private String csmEndpoint;
     private String[] acceptProtos = {"mqtt"};
     private String deviceName;
     private String deviceModel;
     private String BIND_RC_URL;
+    private String BIND_M2_URL;
     private AppID deviceAddr;
     private String userName = null;
     private DAN dan;
+    private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
 
     private HashMap<String, BaseSensor> sensors;
 
-    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, String deviceName, String deviceModel, HashMap<String, BaseSensor> sensors) {
+    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, String BIND_M2_URL, String deviceName, String deviceModel, HashMap<String, BaseSensor> sensors) {
         this.csmEndpoint = csmEndpoint;
         this.deviceName = deviceName;
         this.deviceModel = deviceModel;
         this.deviceAddr = Utils.getDeviceAddress(context, csmEndpoint, deviceModel, deviceName, true);
         this.BIND_RC_URL = BIND_RC_URL;
+        this.BIND_M2_URL = BIND_M2_URL;
         this.sensors = sensors;
     }
 
@@ -46,11 +51,16 @@ public class EduTalkDAI {
         //set consumer of sensor
         for (BaseSensor sensor : sensors.values()) {
             sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
-                long sendAt=0;
+                long sendAt=System.currentTimeMillis();
                 try {
                     JSONArray data = new JSONArray(sensorData);
-                    sendAt = System.currentTimeMillis();
-                    if (((DFInfo)sensor.getBaseSensorType()).isNeedTimeStamp())data.put(sensorData.length, sendAt);
+                    DFInfo dfInfo = (DFInfo)sensor.getBaseSensorType();
+
+                    if (dfInfo.isNeedTimeStamp())
+                        data.put(sensorData.length, sendAt);
+                    if (dfInfo.isNeedDfName())
+                        data.put(data.length(), sensor.getId().replace("-", "_"));
+
                     dan.push(sensor.getId(), data);  //push data
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -65,6 +75,7 @@ public class EduTalkDAI {
                 //register and connect
                 dan.register();
                 EduTalkService.bindRC(BIND_RC_URL, deviceAddr.getUUID().toString());
+                if (BIND_M2_URL!=null) EduTalkService.bindM2(BIND_M2_URL);
                 //start sensor
                 /*for (BaseSensor sensor : sensors) {
                     sensor.start();
@@ -94,9 +105,10 @@ public class EduTalkDAI {
         dan = new DAN(csmEndpoint, acceptProtos, dfList, deviceAddr, deviceName, registerProfile) {
             @Override
             public boolean onSignal(String command, String df) {
-                //when device feature connect or disconnect on joins (first connect or last disconnect only)!
+                //when device feature connect or disconnect on joins
                 System.out.println(df + ":" + command);
-                sensors.get(df).start();
+                if (command.equals("CONNECT"))
+                    scheduledExecutor.schedule(()->sensors.get(df).start(), 2, TimeUnit.SECONDS);
                 return true;
             }
         };
