@@ -30,20 +30,8 @@
 
                 <data
                     android:scheme="https"
-                    android:host="joejoe2.github.io"
-                    android:pathPrefix="/applink/edutalk/Smartphone" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:scheme="https"
                     android:host="iottalk.github.io"
-                    android:pathPrefix="/applink/edutalk/Smartphone"
-                    />
+                    android:pathPrefix="/applink/edutalk/Smartphone" />
             </intent-filter>
         </activity>
         <activity
