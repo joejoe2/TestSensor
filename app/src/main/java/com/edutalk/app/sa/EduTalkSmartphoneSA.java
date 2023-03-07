@@ -107,7 +107,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         for (int i=0;i<iv_list.length();i++){
-            String displayName = iv_list.getJSONObject(i).getString("giv_name");
+            String displayName = iv_list.getJSONObject(i).getString("giv_name")+iv_list.getJSONObject(i).get("index");
             JSONArray params=iv_list.getJSONObject(i).getJSONArray("params");
 
             for (int j=0;j<params.length();j++){
@@ -118,8 +118,9 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                 //build label for odf
                 if (j==0)dataLayout.addView(CustomUIFactory.buildLabel(this, displayName));
 
+                String device = param.optString("device", "");
                 //build sensor
-                if (param.getString("device").equals("Smartphone")){
+                if ("Smartphone".equals(device)){
                     StreamSensorType sensorType=null;
                     for (StreamSensorType streamSensorType:StreamSensorType.values()){
                         if(streamSensorType.getAlias().equals(param.getString("sensor"))){
@@ -151,47 +152,47 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
                                     .mapToObj(index -> String.format("%.2f", data[index])).toArray(String[]::new));
                         }));
                     }
-                }else if(TriggerSensorType.RangeSlider.getAlias().equals(param.getString("device"))){
+                }else if(TriggerSensorType.RangeSlider.getAlias().equals(device)){
                     float step=0.01f; // configurable ?
                     int stepPrecision = (""+step).length()-1-(""+step).indexOf(".");
                     //build ui
                     SeekBar seekBar = CustomUIFactory.buildSeekBar(this);
-                    seekBar.setValue(String.format("%."+stepPrecision+"f", (float)param.getInt("default")));
+                    seekBar.setValue(String.format("%."+stepPrecision+"f", (float)param.getDouble("default")));
                     dataLayout.addView(seekBar);
                     TriggerSensorType sensorType = TriggerSensorType.RangeSlider;
                     sensorType.setNeedTimestamp(true);
                     sensorType.setNeedDfName(true);
                     //build sensor
                     sensor = new RangeSensor(idfName, seekBar, sensorType,
-                            param.getInt("min"), param.getInt("max"), step, param.getInt("default"));
+                            (float)param.getDouble("min"), (float)param.getDouble("max"), step, (float)param.getDouble("default"));
                     sensor.setOnSensorSignalCallBack((float[] data) -> runOnUiThread(()-> seekBar.setValue(String.format("%."+stepPrecision+"f", data[0]))));
                 }else {
                     UnSupportSensorType sensorType;
-                    if(UnSupportSensorType.InputBox.getAlias().equals(param.getString("device"))){
+                    if(UnSupportSensorType.InputBox.getAlias().equals(device)){
                         //build sensor
                         sensorType=UnSupportSensorType.InputBox;
                         sensorType.setNeedTimestamp(true);
                         sensorType.setNeedDfName(true);
                         sensor = sensors.getOrDefault(idfName, new UnSupportSensor(idfName, sensorType));
-                        ((UnSupportSensor)sensor).getDefaultVals().add((float) param.getInt("default"));
+                        ((UnSupportSensor)sensor).getDefaultVals().add(param.get("default"));
                         //build ui
                         DataText dataText = CustomUIFactory.buildDataText(this);
                         dataText.setValues(sensorType.getAlias()+" is not supported now");
                         dataLayout.addView(dataText);
-                    }else if (UnSupportSensorType.Morsensor.getAlias().equals(param.getString("device"))){
+                    }else if (UnSupportSensorType.Morsensor.getAlias().equals(device)){
                         //build sensor
                         sensorType=UnSupportSensorType.Morsensor;
                         sensorType.setNeedTimestamp(true);
                         sensor = sensors.getOrDefault(idfName, new UnSupportSensor(idfName, sensorType));
-                        ((UnSupportSensor)sensor).getDefaultVals().add((float) param.getInt("default"));
+                        ((UnSupportSensor)sensor).getDefaultVals().add((float) param.getDouble("default"));
                         //build ui
                         DataText dataText = CustomUIFactory.buildDataText(this);
                         dataText.setValues(sensorType.getAlias()+" is not supported now");
                         dataLayout.addView(dataText);
-                    }else if("M2".equals(param.getString("device"))){
+                    }else{
                         //build ui
                         DataText dataText = CustomUIFactory.buildDataText(this);
-                        dataText.setValues("Using M2 "+param.optString("sensor", "sensor")+" Sensor on EduTalk");
+                        dataText.setValues("Using "+device+" "+param.optString("sensor", "sensor")+" Sensor on EduTalk");
                         dataLayout.addView(dataText);
                     }
                 }

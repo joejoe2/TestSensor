@@ -1,6 +1,7 @@
 package com.edutalk.app.edutalk;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.edutalk.app.sensor.BaseSensor;
 import com.edutalk.app.sensor.DFInfo;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,17 +52,20 @@ public class EduTalkDAI {
 
         //set consumer of sensor
         for (BaseSensor sensor : sensors.values()) {
-            sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
+            sensor.setSensorDataConsumerCallBack((List<Object> sensorData) -> {
                 long sendAt=System.currentTimeMillis();
                 try {
-                    JSONArray data = new JSONArray(sensorData);
+                    JSONArray data = new JSONArray();
+                    for (Object o : sensorData){
+                        data.put(o);
+                    }
                     DFInfo dfInfo = (DFInfo)sensor.getBaseSensorType();
 
                     if (dfInfo.isNeedTimeStamp())
-                        data.put(sensorData.length, sendAt);
+                        data.put(sendAt);
                     if (dfInfo.isNeedDfName())
-                        data.put(data.length(), sensor.getId().replace("-", "_"));
-
+                        data.put(sensor.getId().replace("-", "_"));
+                    Log.i("dai", sensor.getId()+" "+data);
                     dan.push(sensor.getId(), data);  //push data
                 } catch (Exception e) {
                     e.printStackTrace();

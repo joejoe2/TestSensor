@@ -1,5 +1,7 @@
 package com.edutalk.app.sensor;
 
+import java.util.List;
+
 public abstract class BaseSensor {
     protected String id;
     public String getId(){
@@ -16,7 +18,7 @@ public abstract class BaseSensor {
         this.id = id;
         this.baseSensorType = baseSensorType;
         this.onSignalCallback = (float[] sensorData) -> {}; //do nothing...
-        this.onConsumeCallback = (float[] sensorData) -> {return 0;}; //do nothing...
+        this.onConsumeCallback = (List<Object> sensorData) -> {return 0;}; //do nothing...
     }
 
     public void setOnSensorSignalCallBack(OnSignalCallBack onSignalCallback){

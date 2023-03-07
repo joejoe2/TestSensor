@@ -6,7 +6,10 @@ import android.view.View;
 import com.edutalk.app.customUI.SeekBar;
 import com.edutalk.app.sensor.BaseSensor;
 
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class RangeSensor extends BaseSensor {
     private View uiComponent;
@@ -68,7 +71,7 @@ public class RangeSensor extends BaseSensor {
             while (!dataConsumerExit) {
                 float[] data;
                 if ((data = dataQueue.poll())!=null){
-                    onConsumeCallback.consume(data);
+                    onConsumeCallback.consume(IntStream.range(0, data.length).mapToObj(i->data[i]).collect(Collectors.toList()));
                 }else {
                     try {
                         Thread.sleep(consumeIntervalMS);

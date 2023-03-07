@@ -1,5 +1,7 @@
 package com.edutalk.app.sensor;
 
+import java.util.List;
+
 /**
  * this is a interface for StreamingSensor, the consume() is to defined
  * dataConsumer in StreamingSensor how to process each data from dataQueue,
@@ -9,5 +11,5 @@ package com.edutalk.app.sensor;
  * please use asyn or thread manner, otherwise the dataConsumer will be blocked util your work done.
  */
 public interface OnConsumeCallback {
-    public long consume(float[] sensorData);
+    public long consume(List<Object> sensorData);
 }

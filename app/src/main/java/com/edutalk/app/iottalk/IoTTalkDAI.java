@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import iottalk.AppID;
 import iottalk.DAN;
@@ -41,16 +43,16 @@ public class IoTTalkDAI {
 
         //set consumer of StreamingSensor
         for (StreamSensor sensor : sensors) {
-            sensor.setSensorDataConsumerCallBack((float[] sensorData) -> {
+            sensor.setSensorDataConsumerCallBack((List<Object> sensorData) -> {
                 long sendAt=System.currentTimeMillis();
                 try {
                     JSONArray data = new JSONArray(sensorData);
                     DFInfo dfInfo = (DFInfo)sensor.getBaseSensorType();
 
                     if (dfInfo.isNeedTimeStamp())
-                        data.put(sensorData.length, sendAt);
+                        data.put(sensorData.size(), sendAt);
                     if (dfInfo.isNeedDfName())
-                        data.put(sensorData.length, sensor.getId().replace("-", "_"));
+                        data.put(sensorData.size(), sensor.getId().replace("-", "_"));
 
                     dan.push(sensor.getId(), data);
                 } catch (Exception e) {

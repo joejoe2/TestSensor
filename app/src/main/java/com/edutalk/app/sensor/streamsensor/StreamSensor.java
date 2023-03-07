@@ -9,8 +9,11 @@ import com.edutalk.app.sensor.BaseSensor;
 import com.edutalk.app.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * this class implements android streaming sensor with producer-consumer manner<br>
@@ -77,7 +80,7 @@ public class StreamSensor extends BaseSensor {
             while (!isDataConsumerExit) {
                 float[] data;
                 if ((data = dataQueue.poll())!=null){
-                    t = onConsumeCallback.consume(data);
+                    t = onConsumeCallback.consume(IntStream.range(0, data.length).mapToObj(i->data[i]).collect(Collectors.toList()));
                     sendTime.add(t);
                 }else {
                     LockSupport.parkNanos(consumeIntervalNS);

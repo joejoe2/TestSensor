@@ -3,12 +3,15 @@ package com.edutalk.app.sensor.unsupportsensor;
 import com.edutalk.app.sensor.BaseSensor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class UnSupportSensor extends BaseSensor {
-    private ArrayList<Float> defaultVals;
+    private ArrayList<Object> defaultVals;
 
-    private ConcurrentLinkedQueue<float[]> dataQueue;
+    private ConcurrentLinkedQueue<Object[]> dataQueue;
 
     public UnSupportSensor(String id, UnSupportSensorType sensorType) {
         super(id, sensorType);
@@ -16,7 +19,7 @@ public class UnSupportSensor extends BaseSensor {
         dataQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public ArrayList<Float> getDefaultVals() {
+    public ArrayList<Object> getDefaultVals() {
         return defaultVals;
     }
 
@@ -29,7 +32,7 @@ public class UnSupportSensor extends BaseSensor {
 
     @Override
     public void startSensing() {
-        float[] data=new float[defaultVals.size()];
+        Object[] data=new Object[defaultVals.size()];
         for(int i=0;i<defaultVals.size();i++){
             data[i]=defaultVals.get(i);
         }
@@ -39,9 +42,9 @@ public class UnSupportSensor extends BaseSensor {
 
     @Override
     protected void startConsuming() {
-        float[] data;
+        Object[] data;
         if ((data = dataQueue.poll())!=null)
-            onConsumeCallback.consume(data);
+            onConsumeCallback.consume(IntStream.range(0, data.length).mapToObj(i->data[i]).collect(Collectors.toList()));
     }
 
     @Override
