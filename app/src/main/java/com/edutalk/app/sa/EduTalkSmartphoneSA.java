@@ -94,7 +94,7 @@ public class EduTalkSmartphoneSA extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.m2_bind, eduTalkRCConfig.device_name, eduTalkRCConfig.device_model, selectedSensors);
+        dai = new EduTalkDAI(this, eduTalkRCConfig.csm_url, eduTalkRCConfig.rc_bind, eduTalkRCConfig.bindCallbacks, eduTalkRCConfig.deviceName, eduTalkRCConfig.deviceModel, selectedSensors);
     }
 
     private HashMap<String, BaseSensor> getSensors(EduTalkRCConfig rcConfig) throws JSONException {

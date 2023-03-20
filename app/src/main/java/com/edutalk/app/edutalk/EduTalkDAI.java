@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +27,7 @@ public class EduTalkDAI {
     private String deviceName;
     private String deviceModel;
     private String BIND_RC_URL;
-    private String BIND_M2_URL;
+    private List<String> bindCallbacks;
     private AppID deviceAddr;
     private String userName = null;
     private DAN dan;
@@ -36,13 +35,13 @@ public class EduTalkDAI {
 
     private HashMap<String, BaseSensor> sensors;
 
-    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, String BIND_M2_URL, String deviceName, String deviceModel, HashMap<String, BaseSensor> sensors) {
+    public EduTalkDAI(Context context, String csmEndpoint, String BIND_RC_URL, List<String> bindCallbacks, String deviceName, String deviceModel, HashMap<String, BaseSensor> sensors) {
         this.csmEndpoint = csmEndpoint;
         this.deviceName = deviceName;
         this.deviceModel = deviceModel;
         this.deviceAddr = Utils.getDeviceAddress(context, csmEndpoint, deviceModel, deviceName, true);
         this.BIND_RC_URL = BIND_RC_URL;
-        this.BIND_M2_URL = BIND_M2_URL;
+        this.bindCallbacks = bindCallbacks;
         this.sensors = sensors;
     }
 
@@ -80,11 +79,9 @@ public class EduTalkDAI {
                 //register and connect
                 dan.register();
                 EduTalkService.bindRC(BIND_RC_URL, deviceAddr.getUUID().toString());
-                if (BIND_M2_URL!=null) EduTalkService.bindM2(BIND_M2_URL);
-                //start sensor
-                /*for (BaseSensor sensor : sensors) {
-                    sensor.start();
-                }*/
+                for (String bindUrl:bindCallbacks){
+                    EduTalkService.bind(bindUrl);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

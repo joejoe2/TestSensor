@@ -2,9 +2,7 @@ package com.edutalk.app.edutalk;
 
 import android.util.Log;
 
-import org.eclipse.paho.client.mqttv3.logging.LoggerFactory;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,8 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -23,8 +19,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.internal.connection.ConnectInterceptor;
-import okhttp3.internal.http.CallServerInterceptor;
 
 public class EduTalkService {
     private static OkHttpClient httpClient;
@@ -73,7 +67,7 @@ public class EduTalkService {
         System.out.println("rc_bind: "+res);
     }
 
-    public static void bindM2(String url) throws IOException{
+    public static void bind(String url) throws IOException{
         HashMap<String, String> headers=new HashMap<>();
         headers.put("x-csrf-token", getCsrfToken(url));
         headers.put("referer", url);
@@ -82,7 +76,7 @@ public class EduTalkService {
         Response response = httpClient.newCall(request).execute();
         String res = response.body().string();
         response.close();
-        System.out.println("m2_bind: "+res);
+        System.out.println(url+" bind: "+res);
     }
 
     private static String getCsrfToken(String url)throws IOException{

@@ -7,12 +7,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class EduTalkRCConfig implements Serializable {
     public int lectureID;
-    public String device_name, device_model, csm_url, rc_bind, m2_bind;
+    public String deviceName;
+    public String deviceModel;
+    public String csm_url;
+    public String rc_bind;
+    public List<String> bindCallbacks = new ArrayList<>();
     private String idfs;
     private String iv_list;
 
@@ -23,8 +29,8 @@ public class EduTalkRCConfig implements Serializable {
      */
     public EduTalkRCConfig(JSONObject jsonResponse) throws JSONException {
         lectureID = jsonResponse.getInt("lecture");
-        device_name = jsonResponse.getString("dev");
-        device_model = jsonResponse.getString("dm_name");
+        deviceName = jsonResponse.getString("dev");
+        deviceModel = jsonResponse.getString("dm_name");
         idfs = jsonResponse.getJSONArray("idfs").toString();
 
         JSONArray iv_list=new JSONArray();
@@ -43,8 +49,11 @@ public class EduTalkRCConfig implements Serializable {
 
         csm_url = jsonResponse.getString("csm_url");
         rc_bind = jsonResponse.getString("rc_bind");
-        m2_bind = jsonResponse.optString("m2_bind", null);
-        //if (csm_url.startsWith("https")&rc_bind.startsWith("http"))rc_bind = rc_bind.replace("http", "https");
+        JSONArray callbacks = jsonResponse.optJSONArray("bind_callbacks");
+        if (callbacks!=null)
+            for (int i=0;i<callbacks.length();i++){
+                bindCallbacks.add(callbacks.getString(i));
+            }
     }
 
     public JSONArray getIdfs() throws JSONException {
