@@ -41,6 +41,7 @@ public class SeekBar extends LinearLayout{
         seekBar = new android.widget.SeekBar(getContext());
         seekBar.setProgressDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_progress, null));
         seekBar.setThumb(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_thumb, null));
+        seekBar.setSplitTrack(false);
         seekBar.setPadding(0, 15, 0, 10);
         seekBar.setMin(0);
         seekBar.setMax(lengthOfSeekBar);

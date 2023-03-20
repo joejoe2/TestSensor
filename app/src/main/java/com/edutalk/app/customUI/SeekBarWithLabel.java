@@ -47,6 +47,7 @@ public class SeekBarWithLabel extends com.edutalk.app.customUI.SeekBar {
         seekBar = new SeekBar(getContext());
         seekBar.setProgressDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_progress, null));
         seekBar.setThumb(ResourcesCompat.getDrawable(getResources(), R.drawable.seekbar_drawable_thumb, null));
+        seekBar.setSplitTrack(false);
         seekBar.setPadding(0, 15, 0, 10);
         seekBar.setMin(0);
         seekBar.setMax(lengthOfSeekBar);
